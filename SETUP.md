@@ -21,14 +21,17 @@ ai-skills/
 ├── SETUP.md                      ← this file
 ├── README.md/.gitignore
 ├── skills/                       ← runnable Devin skills (frontmatter name+description)
-│   ├── jira-configuration/SKILL.md
-│   └── helcim-psso-playbook/ (SKILL.md + Okta-LDAP-Jamf-Netskope-Runbook.md)
+│   ├── jira-configuration/SKILL.md        (merged LEGAL+OPS copies, see §7)
+│   ├── helcim-psso-playbook/ (SKILL.md + Okta-LDAP-Jamf-Netskope-Runbook.md)
+│   └── directmail-hubspot-integration/SKILL.md   (added from laptop #2)
 ├── hacks/                        ← project memory packs (inject 00-* first)
 │   └── helcim-zero-touch/ (00-…08-*.md + tools/*.swift)
 └── runbooks/                     ← human-readable procedures/config
     ├── zero-touch/ (PSSO handoffs, checklist, 2 Okta Verify plists)
     ├── okta-apps/ (Lingo SAML SSO)
-    └── google-workspace/ (Google Workspace Hacks)
+    ├── google-workspace/ (Google Workspace Hacks + Gmail-Logs-to-BigQuery.docx)
+    ├── laptop-compliance/ (Jira structure plan, ITSP)          ← from laptop #2
+    └── apple-id/ (Mobile Test Account Migration .docx)          ← from laptop #2
 ```
 
 **Content sources (copied, originals left in place):**
@@ -74,27 +77,31 @@ New skill = folder under `skills/<name>/SKILL.md` with frontmatter + one symlink
 ln -sfn "$PWD/skills/<name>" ~/.config/devin/skills/<name>
 ```
 
-## 7. PENDING — onboard laptop #2
+## 7. DONE — laptop #2 onboarded (M3 MacBook Pro, 2026-09-16)
 
-Laptop #2 has its **own local-only repo with unique content**. Plan: stage it on GitHub, merge here, then laptop #2 also runs only `ai-skills`.
+The plan below assumed laptop #2 had its own git repo — it didn't. Reality: loose folders only,
+so onboarding was clone-then-merge instead of push-then-merge. What actually happened:
 
-**Run on laptop #2:**
-```bash
-cd ~/path/to/that-repo
-git config --global user.name "Abdi Obsiye"   # if unset
-git config --global user.email "soolizia@gmail.com"
-git status || { git init -b main; git add -A; git commit -m "Laptop 2 notes"; }
-ssh-keygen -t ed25519 -C "laptop2" -f ~/.ssh/id_ed25519 -N ""
-cat ~/.ssh/id_ed25519.pub                     # add at github.com/settings/ssh/new
-# Create PRIVATE repo "skills-laptop-2" at github.com/new (no README/gitignore)
-git remote add origin git@github.com:ob5iye/skills-laptop-2.git
-git push -u origin main
-```
-
-**Then, on this Mac (Devin-assisted):**
-1. `git clone git@github.com:ob5iye/skills-laptop-2.git` into a temp folder
-2. Re-scan for secrets
-3. Diff vs `ai-skills`; file unique content into `skills/` / `hacks/` / `runbooks/`
-4. Commit + push
-5. Laptop #2: `git clone git@github.com:ob5iye/ai-skills.git`, verify content arrived, then **archive/delete its old repo folder** (never keep two editable copies)
-6. Optionally delete the temporary `skills-laptop-2` GitHub repo once merge is confirmed
+1. Laptop #2's existing `~/.ssh/id_ed25519.pub` (created Mar 2025) added to GitHub as "M3"
+   (Authentication Key). SSH auth verified.
+2. `git clone git@github.com:ob5iye/ai-skills.git ~/Documents/Devin/ai-skills` (same path as laptop #1).
+3. **Diverged copy found:** `~/Documents/Devin Skills/jira-configuration/SKILL.md` (262 lines,
+   OPS space: forms/automation/board-filters) vs repo copy (77 lines, LEGAL space: workflows/
+   statuses/service accounts). Complementary, not conflicting → **merged into one SKILL.md**
+   (`skills/jira-configuration/`). Keep editing the repo copy only.
+4. **Unique content added from laptop #2:**
+   - `~/Documents/Devin Skills/directmail-hubspot-integration/` → `skills/directmail-hubspot-integration/`
+   - `~/Claude/Projects/JIRA - INTUNE project/…Plan.md` → `runbooks/laptop-compliance/`
+   - `~/Claude/Projects/Google Workspace hacks/Gmail-Logs-to-BigQuery-Runbook.docx` → `runbooks/google-workspace/`
+   - `~/Claude/Projects/Apple ID/…Apple-First Plan.docx` → `runbooks/apple-id/`
+5. Secret scan on all new text + inside docx XML: placeholders only, no tokens. ✔
+6. Symlinks created on laptop #2 for all three skills (jira-configuration, helcim-psso-playbook,
+   directmail-hubspot-integration) into `~/.config/devin/skills/`.
+7. Legacy folder `~/Documents/Devin Skills/` renamed to `Devin Skills (MIGRATED to ai-skills — safe to delete)`.
+   Delete once verified. `~/Claude/Projects/*` originals left in place.
+8. **Deliberately NOT imported from laptop #2:** `~/Claude/Projects/{Sahan NHSP, CIP, Survy, …}` —
+   grant/foundation working docs, not skills/runbooks. Revisit if Sahan work becomes a skill.
+9. ⚠ Laptop #2 global git identity is `@aobsiye <aobsiye@helcim.com>` (work). Set repo-local
+   identity before committing from laptop #2:
+   `git -C ~/Documents/Devin/ai-skills config user.name "Abdi Obsiye"` and
+   `git -C ~/Documents/Devin/ai-skills config user.email "soolizia@gmail.com"`
