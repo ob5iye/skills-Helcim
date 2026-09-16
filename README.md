@@ -7,7 +7,7 @@ Personal AI skills + knowledge base for Helcim IT work (Devin CLI / Claude).
 | Path | What it is | Loaded by Devin? |
 |---|---|---|
 | `skills/<name>/SKILL.md` | Runnable Devin skills (frontmatter + instructions) | Yes — symlinked into `~/.config/devin/skills/` |
-| `packs/<name>/` | Project memory packs (numbered markdown docs, inject `00-*` first) | No — attach to sessions as context |
+| `hacks/<name>/` | Project memory packs (numbered markdown docs, inject `00-*` first) | No — attach to sessions as context |
 | `runbooks/<topic>/` | Human-readable procedures, checklists, config plists | No — reference material |
 
 ## Current contents
@@ -16,7 +16,7 @@ Personal AI skills + knowledge base for Helcim IT work (Devin CLI / Claude).
 - `jira-configuration` — Helcim Jira environment: projects, workflows, statuses, service accounts, board configs
 - `helcim-psso-playbook` — Okta Platform SSO / Desktop Password Sync on macOS via Jamf Pro
 
-**Packs**
+**Hacks**
 - `helcim-zero-touch` — 9-file Okta PSSO + Jamf + Netskope master archive (inject `00-PROJECT-MEMORY.md` first) + Swift tools
 
 **Runbooks**
