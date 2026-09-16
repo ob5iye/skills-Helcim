@@ -34,14 +34,10 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 ## Wiring skills into Devin (symlinks)
 
 ```bash
-mkdir -p ~/.config/devin/skills
-ln -sfn "$PWD/skills/helcim-context"                  ~/.config/devin/skills/helcim-context
-ln -sfn "$PWD/skills/jira-configuration"              ~/.config/devin/skills/jira-configuration
-ln -sfn "$PWD/skills/helcim-psso-playbook"            ~/.config/devin/skills/helcim-psso-playbook
-ln -sfn "$PWD/skills/directmail-hubspot-integration"  ~/.config/devin/skills/directmail-hubspot-integration
+./install.sh   # symlinks every skills/<name>/ into ~/.config/devin/skills
 ```
 
-Devin follows symlinks, so `git pull` = updated skills everywhere. Adding a new skill = new folder under `skills/` + one more symlink line above.
+Run once on machine setup, and **after every `git pull`** (it picks up new skills automatically — idempotent, safe to re-run anytime). Adding a new skill = new folder under `skills/` + `./install.sh`.
 
 ## House rules
 
