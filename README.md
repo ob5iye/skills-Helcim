@@ -16,6 +16,7 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 ## Current contents
 
 **Skills**
+- `helcim-context` — **router**: routes any Helcim task to the right skill/runbook; writes durable learnings back and pushes
 - `jira-configuration` — Helcim Jira environment: projects, workflows, statuses, forms, automation flows, boards, service accounts
 - `helcim-psso-playbook` — Okta Platform SSO / Desktop Password Sync on macOS via Jamf Pro
 - `directmail-hubspot-integration` — Directmail.io QR-scan webhook → HubSpot via Google Apps Script receiver (no Ops Hub Pro / Zapier)
@@ -34,6 +35,7 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 
 ```bash
 mkdir -p ~/.config/devin/skills
+ln -sfn "$PWD/skills/helcim-context"                  ~/.config/devin/skills/helcim-context
 ln -sfn "$PWD/skills/jira-configuration"              ~/.config/devin/skills/jira-configuration
 ln -sfn "$PWD/skills/helcim-psso-playbook"            ~/.config/devin/skills/helcim-psso-playbook
 ln -sfn "$PWD/skills/directmail-hubspot-integration"  ~/.config/devin/skills/directmail-hubspot-integration
