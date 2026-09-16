@@ -1,0 +1,13 @@
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+
+# macOS junk
+.DS_Store
+
+# Transient export/working files
+exports/
+extracted.txt
+payload-*.json
