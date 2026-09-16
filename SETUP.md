@@ -99,8 +99,15 @@ so onboarding was clone-then-merge instead of push-then-merge. What actually hap
    directmail-hubspot-integration) into `~/.config/devin/skills/`.
 7. Legacy folder `~/Documents/Devin Skills/` renamed to `Devin Skills (MIGRATED to ai-skills — safe to delete)`.
    Delete once verified. `~/Claude/Projects/*` originals left in place.
-8. **Deliberately NOT imported from laptop #2:** `~/Claude/Projects/{Sahan NHSP, CIP, Survy, …}` —
-   grant/foundation working docs, not skills/runbooks. Revisit if Sahan work becomes a skill.
+8. **Sahan import (done 2026-09-16, same day, per user request):** `~/Claude/Projects/Sahan NHSP` →
+   `sahan/grants/nhsp/`; `~/Claude/Projects/CIP` → `sahan/grants/cip-gate/`; Sahan grant masters from
+   `~/Downloads` → `sahan/grants/<name>/` + `sahan/registry/`. Found two ready-made Devin skills in the
+   CIP folder → promoted to `skills/sahan-rise-together-calgary/` + `skills/cip-newcomer-women-program/`
+   (symlinked live). Org profile + pipeline index written at `sahan/README.md` (load-first context doc).
+   **Excluded on purpose:** `~/Documents/SAHAN` (3.1 GB Syncthing photo dump; `Salwa/` is a *separate*
+   org's incorporation package with PII — not Sahan's content) and banking docs (`SAHAN-XX/Sahan
+   Account`, balance-confirmation letters). Duplicates removed by md5 (4× contribution record,
+   3× society return, 2× incorporation cert).
 9. ⚠ Laptop #2 global git identity is `@aobsiye <aobsiye@helcim.com>` (work). Set repo-local
    identity before committing from laptop #2:
    `git -C ~/Documents/Devin/ai-skills config user.name "Abdi Obsiye"` and
