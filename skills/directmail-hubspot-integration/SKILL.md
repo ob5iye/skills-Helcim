@@ -42,19 +42,44 @@ both are free and work on the current HubSpot plan.
   must carry a **unique per-recipient code** (pURL/unique code) present in the webhook
   payload. Must confirm this is in the real payload.
 
-## Blocked on (ask Feyi)
+## Status (Sep 18, 2026): deployed and verified end-to-end
 
-A **sample webhook payload** from Directmail.io. Needed to finalize the field mapping block
-`F` in the script. Ask at the same time: (1) does the payload include the unique
-recipient code per QR scan, (2) is the webhook real-time per scan or batched.
+- Deployed as **Version 3** (Web app, Execute as: Me, access: Anyone). Vendor posts to
+  `https://script.google.com/macros/s/AKfycbxP6VcmgqFqGfPW73Gq4j5k20br5BT__Yi_LT18TptzwsmNxVxau4VJPFS7oE9rIcpNkQ/exec?token=<WEBHOOK_SECRET>`
+  (URL alone is harmless without the token).
+- Sheet has manual header row: `Timestamp | Email | QR Code | Campaign | Raw Payload`.
+- **Sep 17, 1:20 PM:** real POST logged with flat test payload
+  `{"email":"demo.scanner@helcim-test.com","qr_code":"DEMO-QR-2026","campaign":"Fall2026-DirectMail"}`
+  — matches `F` exactly.
+- **Sep 18, 9:37 AM:** Directmail.io's live test POST arrived. Payload was an **array of
+  campaign/list metadata** (`campaign_id 43957 "Helcim"`, dates 2026-09-18→10-18, list
+  `test_contact_webhook.csv`) — no person fields → script created a **blank HubSpot contact**
+  (`qr_scan_count=1` + `last_qr_scan_timestamp` only). Contact activity shows source
+  "Offline Sources from **QR Scan Webhook Receiver**" (the private app name) — proof the
+  vendor → Apps Script → HubSpot chain works.
+- **Vendor-side problem:** they claimed 3 test sends; only the 9:37 AM one reached Google
+  (Executions page shows no other doPost attempts — every POST that hits Google logs one,
+  even rejected ones). The other 2 failed before delivery. Hypothesis to confirm with vendor:
+  Apps Script answers `/exec` with a 302 redirect to script.googleusercontent.com and their
+  dashboard flags that as failed delivery. Asked vendor for per-send HTTP status/errors.
+- **Vendor clarified (Sep 18 PM):** their "3 test records" were **3 objects in ONE batched
+  push** — matches the single 9:37 AM execution exactly. Nothing was lost; the
+  302-failed-delivery hypothesis for the "missing 2" was wrong.
+- **Script updated + redeployed (Sep 18):** array unwrapping (each lead → own sheet row +
+  HubSpot contact), per-record fault tolerance, `doGet` health check, parse-failure logging.
+  Verified the new version is live via browser GET → `{"status":"ok","service":"directmail-webhook-receiver"}`.
+- Cleanup pending: delete the blank Sep-18 contact and the `demo.scanner@helcim-test.com`
+  test contact from HubSpot once the team has seen them. **Rotate the HubSpot private app
+  token** (it appeared in a chat screenshot on Sep 18) and update Script Properties.
 
-Message already sent to the team (for context):
+## Still blocked on (ask Feyi / vendor)
 
-> We don't need the $10k HubSpot plan or Zapier. I can build it with Google Apps Script for
-> free: Directmail.io's webhook hits a script I host, it logs every scan to a Google Sheet
-> and pushes the data into HubSpot through the API. Can you send me a sample of the actual
-> webhook payload so I can confirm the field mapping? Also confirm the payload includes the
-> unique QR code per recipient — we need that to match scans to contacts.
+A sample of the **real per-scan payload** (the Sep 18 test was campaign/list metadata,
+not a person record). Vendor confirmed on Sep 18 that **sends are batched — one push
+carries multiple lead objects** (test was 3 leads in 1 push); the script now handles that.
+Remaining open questions: (1) field names in a real scan record (needed to finalize `F`),
+(2) max leads per push (payload-size concern if they ever batch in the hundreds),
+(3) does the scan payload include the unique per-recipient code.
 
 ## Build steps
 
@@ -79,7 +104,7 @@ Message already sent to the team (for context):
 ## The script
 
 ```javascript
-// ===== FIELD MAPPING — adjust once Directmail.io shares a sample payload =====
+// ===== FIELD MAPPING — provisional until a real per-scan payload is confirmed =====
 const F = {
   email:    'email',     // key in their JSON holding recipient email
   code:     'qr_code',   // key holding the unique per-recipient QR/pURL code
@@ -90,18 +115,43 @@ const F = {
 function doPost(e) {
   try {
     // Optional shared-secret check: Directmail.io posts to <URL>?token=yoursecret
-    // const secret = PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET');
-    // if (secret && e.parameter.token !== secret) return json_({error: 'unauthorized'});
+    const secret = PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET');
+    if (secret && (!e || e.parameter.token !== secret)) return json_({error: 'unauthorized'});
 
     if (!e || !e.postData || !e.postData.contents) return json_({error: 'no body'});
 
-    const data = JSON.parse(e.postData.contents);
-    logToSheet_(data);
-    const result = upsertHubSpotContact_(data);
-    return json_({status: 'ok', hubspot: result});
+    let data;
+    try {
+      data = JSON.parse(e.postData.contents);
+    } catch (parseErr) {
+      logRaw_('UNPARSEABLE: ' + e.postData.contents);
+      return json_({status: 'error', message: 'invalid JSON — raw body logged to sheet'});
+    }
+
+    const records = Array.isArray(data) ? data : [data]; // vendor batches leads per push
+    const results = records.map(processRecord_);
+    return json_({status: 'ok', received: records.length, results: results});
   } catch (err) {
     return json_({status: 'error', message: String(err)});
   }
+}
+
+// Health check (vendor/browser GETs) — prevents noisy Failed doGet executions
+function doGet() {
+  return json_({status: 'ok', service: 'directmail-webhook-receiver'});
+}
+
+function processRecord_(data) {
+  logToSheet_(data);
+  try {
+    return upsertHubSpotContact_(data);
+  } catch (err) {
+    return {hubspotError: String(err)};
+  }
+}
+
+function logRaw_(text) {
+  SpreadsheetApp.getActiveSpreadsheet().getSheets()[0].appendRow([new Date(), '', '', '', text]);
 }
 
 function logToSheet_(data) {
@@ -163,7 +213,11 @@ function json_(obj) {
 function testDoPost() {
   const fake = {
     parameter: {},
-    postData: {contents: JSON.stringify({email: 'test@example.com', qr_code: 'TEST-001', campaign: 'Fall2026'})},
+    postData: {contents: JSON.stringify([
+      {email: 'test1@example.com', qr_code: 'TEST-001', campaign: 'Fall2026'},
+      {email: 'test2@example.com', qr_code: 'TEST-002', campaign: 'Fall2026'},
+      {email: 'test3@example.com', qr_code: 'TEST-003', campaign: 'Fall2026'},
+    ])},
   };
   Logger.log(doPost(fake).getContent());
 }
@@ -177,6 +231,24 @@ function testDoPost() {
 - **"Anyone" access is required** so Directmail.io's servers can POST without a Google
   login. The URL is unguessable (long random ID); add the `WEBHOOK_SECRET` check if a
   shared secret is wanted — the hook URL simply gets `?token=...` appended.
+- **"Completed" execution ≠ successful HubSpot write.** `doPost` catches HubSpot errors and
+  still returns 200 to the vendor, so the Executions status column means "script ran", not
+  "contact written." If a sheet row has no HubSpot counterpart, suspect the
+  `HUBSPOT_PRIVATE_APP_TOKEN` Script Property or private-app scopes, not the status column.
+- **A "Completed" execution exists for every POST that reaches Google** — even unauthorized
+  or malformed ones. If the vendor claims sends that have no executions, the requests never
+  arrived (vendor-side failure), full stop.
+- **Failed `doGet` executions are normal noise.** The script only defines `doPost`; browser
+  visits and vendor health-check GETs log as Failed doGet ("function not found"). Silence
+  them with `function doGet() { return json_({status: 'ok'}); }`.
+- **Payloads may be JSON arrays.** The Sep 18 vendor test was `[{...}]`. `data[F.email]` on
+  an array is `undefined` → blank sheet columns B–D and a junk no-email contact in HubSpot.
+  Handle `Array.isArray(data)` when finalizing the script.
+- **Don't verify `/exec` with curl.** script.google.com 302s to a script.googleusercontent.com
+  "echo" URL that curl cannot replay POSTs against (411 Length Required, then Drive "unable
+  to open the file") — even with a cookie jar. Real HTTP clients (the vendor's) traverse the
+  chain fine. To check which code version is live, GET the URL in a browser and read the
+  `doGet` JSON response.
 - **Field mapping block `F` is a placeholder** until the real payload arrives. Matching
   order matters: search by `qr_code` first, fall back to `email`.
 - **Quotas:** free Gmail accounts cap `UrlFetchApp` at ~20k calls/day; each scan costs 2–3
