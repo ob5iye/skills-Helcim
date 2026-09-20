@@ -42,9 +42,9 @@ both are free and work on the current HubSpot plan.
   must carry a **unique per-recipient code** (pURL/unique code) present in the webhook
   payload. Must confirm this is in the real payload.
 
-## Status (Sep 18, 2026): deployed and verified end-to-end
+## Status (Sep 20, 2026): deployed and verified end-to-end
 
-- Deployed as **Version 3** (Web app, Execute as: Me, access: Anyone). Vendor posts to
+- Deployed as **Version 4** (Web app, Execute as: Me, access: Anyone). Vendor posts to
   `https://script.google.com/macros/s/AKfycbxP6VcmgqFqGfPW73Gq4j5k20br5BT__Yi_LT18TptzwsmNxVxau4VJPFS7oE9rIcpNkQ/exec?token=<WEBHOOK_SECRET>`
   (URL alone is harmless without the token).
 - Sheet has manual header row: `Timestamp | Email | QR Code | Campaign | Raw Payload`.
@@ -68,9 +68,18 @@ both are free and work on the current HubSpot plan.
 - **Script updated + redeployed (Sep 18):** array unwrapping (each lead → own sheet row +
   HubSpot contact), per-record fault tolerance, `doGet` health check, parse-failure logging.
   Verified the new version is live via browser GET → `{"status":"ok","service":"directmail-webhook-receiver"}`.
-- Cleanup pending: delete the blank Sep-18 contact and the `demo.scanner@helcim-test.com`
-  test contact from HubSpot once the team has seen them. **Rotate the HubSpot private app
-  token** (it appeared in a chat screenshot on Sep 18) and update Script Properties.
+- **Sep 20 incident — midnight-UTC regression:** the deployed Version 3 script sent
+  `last_qr_scan_timestamp: new Date().toISOString()` (time-of-day included) → every HubSpot
+  write was rejected with `INVALID_DATE ... is at HH:MM:SS UTC, not midnight!` while sheet
+  rows logged normally. The runbook script below already had the `setUTCHours(0,0,0,0)` fix;
+  the live code had lost it in the Sep 18 edit. Fixed in Version 4 and re-verified live:
+  first POST → `{"created":"249609734180"}`, repeat POST → `{"updated":"...","scans":2}`,
+  GET health check → `{"status":"ok",...}`, no-token POST → `{"error":"unauthorized"}`
+  (token check works).
+- Cleanup pending: delete the blank Sep-18 contact, `demo.scanner@helcim-test.com`, and the
+  Sep-20 test contact `livescan@test.com` (ID 249609734180) from HubSpot once the team has
+  seen them. **Rotate the HubSpot private app token** (it appeared in a chat screenshot on
+  Sep 18) and update Script Properties.
 
 ## Still blocked on (ask Feyi / vendor)
 
@@ -246,11 +255,12 @@ function testDoPost() {
 - **Payloads may be JSON arrays.** The Sep 18 vendor test was `[{...}]`. `data[F.email]` on
   an array is `undefined` → blank sheet columns B–D and a junk no-email contact in HubSpot.
   Handle `Array.isArray(data)` when finalizing the script.
-- **Don't verify `/exec` with curl.** script.google.com 302s to a script.googleusercontent.com
-  "echo" URL that curl cannot replay POSTs against (411 Length Required, then Drive "unable
-  to open the file") — even with a cookie jar. Real HTTP clients (the vendor's) traverse the
-  chain fine. To check which code version is live, GET the URL in a browser and read the
-  `doGet` JSON response.
+- **Verifying `/exec` with curl works IF you don't force `-X POST`.** Use
+  `curl -sSL "<URL>?token=$WEBHOOK_SECRET" -H "Content-Type: application/json" -d '{...}'` —
+  with `-d` and no `-X`, curl follows the 302 chain correctly (verified live Sep 20).
+  `-X POST`, `--post302`, or replaying the googleusercontent echo URL manually all fail
+  (411 Length Required / 405 / Drive "unable to open the file"). A GET with no body hits
+  `doGet` and returns the health-check JSON.
 - **Field mapping block `F` is a placeholder** until the real payload arrives. Matching
   order matters: search by `qr_code` first, fall back to `email`.
 - **Quotas:** free Gmail accounts cap `UrlFetchApp` at ~20k calls/day; each scan costs 2–3
