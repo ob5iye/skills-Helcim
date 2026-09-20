@@ -164,7 +164,9 @@ function upsertHubSpotContact_(data) {
   if (!token) throw new Error('Set HUBSPOT_PRIVATE_APP_TOKEN in Script Properties');
 
   const email = data[F.email], code = data[F.code], campaign = data[F.campaign];
-  const props = { last_qr_scan_timestamp: new Date().toISOString() };
+  // HubSpot date-picker properties require midnight UTC — do NOT send current time-of-day
+  const midnight = new Date(); midnight.setUTCHours(0, 0, 0, 0);
+  const props = { last_qr_scan_timestamp: midnight.toISOString() };
   if (campaign) props.last_qr_campaign = campaign;
 
   let contactId = code ? findContactId_(token, 'qr_code', code) : null;
