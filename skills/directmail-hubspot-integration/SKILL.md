@@ -42,7 +42,10 @@ both are free and work on the current HubSpot plan.
   must carry a **unique per-recipient code** (pURL/unique code) present in the webhook
   payload. Must confirm this is in the real payload.
 
-## Status (Sep 20, 2026): deployed and verified end-to-end
+## Status: LIVE (verified end-to-end Sep 21, 2026)
+
+Tracked as **ITSP-111** (Done). Built, tested with the vendor, handed over to Feyi, team
+update posted. History of how it got there:
 
 - Deployed as **Version 4** (Web app, Execute as: Me, access: Anyone). Vendor posts to
   `https://script.google.com/macros/s/AKfycbxP6VcmgqFqGfPW73Gq4j5k20br5BT__Yi_LT18TptzwsmNxVxau4VJPFS7oE9rIcpNkQ/exec?token=<WEBHOOK_SECRET>`
@@ -96,15 +99,14 @@ both are free and work on the current HubSpot plan.
   the team has seen them. **Rotate the HubSpot private app token** (it appeared in a chat
   screenshot on Sep 18) and update Script Properties.
 
-## Still blocked on (ask Feyi / vendor)
+## Remaining open items
 
-A sample of the **real per-scan payload** (the Sep 18 test was campaign/list metadata,
-not a person record). Vendor confirmed on Sep 18 that **sends are batched — one push
-carries multiple lead objects** (test was 3 leads in 1 push); the script now handles that.
-Batching confirmed and end-to-end verified working (Sep 21). Remaining open items:
-(1) paste one FULL raw sheet cell to finalize `F` (`campaign_name` mapping + the
-per-recipient code key + name fields), (2) max leads per push (payload-size concern if
-they ever batch in the hundreds).
+End-to-end verified working (Sep 21). Still open:
+(1) paste one FULL raw sheet cell from a production scan to finalize `F` (`campaign_name`
+mapping + the per-recipient code key + name fields), (2) max leads per push (payload-size
+concern if they ever batch in the hundreds), (3) HubSpot token rotation + test-contact
+cleanup (see status bullet above). Vendor behavior: sends are batched, one push carries
+multiple lead objects.
 
 ## Build steps
 
