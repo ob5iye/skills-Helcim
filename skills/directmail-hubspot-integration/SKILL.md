@@ -68,27 +68,43 @@ both are free and work on the current HubSpot plan.
 - **Script updated + redeployed (Sep 18):** array unwrapping (each lead → own sheet row +
   HubSpot contact), per-record fault tolerance, `doGet` health check, parse-failure logging.
   Verified the new version is live via browser GET → `{"status":"ok","service":"directmail-webhook-receiver"}`.
-- **Sep 20 incident — midnight-UTC regression:** the deployed Version 3 script sent
-  `last_qr_scan_timestamp: new Date().toISOString()` (time-of-day included) → every HubSpot
-  write was rejected with `INVALID_DATE ... is at HH:MM:SS UTC, not midnight!` while sheet
-  rows logged normally. The runbook script below already had the `setUTCHours(0,0,0,0)` fix;
-  the live code had lost it in the Sep 18 edit. Fixed in Version 4 and re-verified live:
-  first POST → `{"created":"249609734180"}`, repeat POST → `{"updated":"...","scans":2}`,
-  GET health check → `{"status":"ok",...}`, no-token POST → `{"error":"unauthorized"}`
-  (token check works).
-- Cleanup pending: delete the blank Sep-18 contact, `demo.scanner@helcim-test.com`, and the
-  Sep-20 test contact `livescan@test.com` (ID 249609734180) from HubSpot once the team has
-  seen them. **Rotate the HubSpot private app token** (it appeared in a chat screenshot on
-  Sep 18) and update Script Properties.
+- **Vendor re-test (Sep 18, 3:41 PM):** array unwrap worked — 3 separate sheet rows, emails
+  extracted (`louvensa03@bergstrom.oom`, `caleigh.keebler@gmail.com`, `jami84@lueilwitz.com`
+  — vendor test data). **But HubSpot got nothing.** Initially suspected missing contacts
+  Read scope (search-before-create) — superseded by the confirmed root cause in the Sep 20
+  entry below.
+- **Real lead payload keys observed (from sheet raw column):** `campaign_id`,
+  `campaign_name`, `campaign_start_date`, `campaign_end_date`, `list_name`,
+  `list_friendly_name`, `list_created_at`, `email`, + more cut off in screenshots. Placeholder
+  `F` mismatches: `campaign` should likely be `campaign_name`; per-recipient code key still
+  unknown (need one FULL raw cell paste).
+- **Sep 20 incident — midnight-UTC regression (confirmed root cause of the Sep-18 write
+  failures):** the deployed Version 3 script sent `last_qr_scan_timestamp:
+  new Date().toISOString()` (time-of-day included) → every HubSpot write was rejected with
+  `INVALID_DATE ... is at HH:MM:SS UTC, not midnight!` while sheet rows logged normally. The
+  runbook script below already had the `setUTCHours(0,0,0,0)` fix; the live code had lost it
+  in the Sep 18 edit. Fixed in Version 4 and re-verified live: first POST →
+  `{"created":"249609734180"}`, repeat POST → `{"updated":"...","scans":2}`, GET health
+  check → `{"status":"ok",...}`, no-token POST → `{"error":"unauthorized"}` (token check works).
+- **Vendor re-test (Sep 21, 10:22 AM):** full pipeline green — 3 sheet rows
+  (`jacobs.alana@strosin.com`, `dariana40@ritchie.net`, `fcronin@wehner.net`) and matching
+  HubSpot contacts created (e.g. `fcronin@wehner.net`, 10:22 AM via "QR Scan Webhook
+  Receiver", company auto-associated from domain). Sheet QR Code/Campaign columns still blank
+  pending `F` finalization.
+- Cleanup pending: delete from HubSpot the blank Sep-18 contact, `demo.scanner@helcim-test.com`,
+  Sep-20 `livescan@test.com` (ID 249609734180), and the Sep-18/21 vendor-test contacts once
+  the team has seen them. **Rotate the HubSpot private app token** (it appeared in a chat
+  screenshot on Sep 18) and update Script Properties.
 
 ## Still blocked on (ask Feyi / vendor)
 
 A sample of the **real per-scan payload** (the Sep 18 test was campaign/list metadata,
 not a person record). Vendor confirmed on Sep 18 that **sends are batched — one push
 carries multiple lead objects** (test was 3 leads in 1 push); the script now handles that.
-Remaining open questions: (1) field names in a real scan record (needed to finalize `F`),
-(2) max leads per push (payload-size concern if they ever batch in the hundreds),
-(3) does the scan payload include the unique per-recipient code.
+Batching confirmed and end-to-end verified working (Sep 21). Remaining open items:
+(1) paste one FULL raw sheet cell to finalize `F` (`campaign_name` mapping + the
+per-recipient code key + name fields), (2) max leads per push (payload-size concern if
+they ever batch in the hundreds).
 
 ## Build steps
 
