@@ -81,8 +81,31 @@ on them. Statuses seen: Backlog, To Do, In Progress, Done.
 
 Use `lookupJiraAccountId` for anyone not listed.
 
+### FIN — Finance
+Company-managed **software** space, key `FIN`. Boards: Reporting (scrum), Collections, Discounts, Operations, Planning & Analysis.
+
+- Workflow scheme: `FIN: Software Simplified Workflow Scheme` — **Finance-only sharing** (verified 2026-09-20, safe to edit in place). ⚠️ Yellow banner seen Sep 2026: Cloud will cap workflow schemes at 150 workflows — watch when copying.
+- **Three workflows, one per group of issue types:**
+  - `Finance: Board Workflow` → Story, Bug, Epic, Task, Sub-task (drives the Reporting board)
+  - `Finance: Collections Workflow` → Collections Agency
+  - `Finance: Jira Board Workflow with Approval Flow` → Employee Reimbursement Request, Merchant Fee Processing Discount Requests, Payment Information Requests — the reimbursement form work lives here; approval statuses seen: Waiting for Approval, Pending Approval, Pending Renewal, Pending Triage
+- `Finance: Board Workflow` statuses: To Do, In Progress, In Review, Done, Archive, Not Applicable, **Pending** (existing global status, In Progress category, reused 2026-09-20). Every status has ⚡Any transition.
+- Known quirk: **duplicate `Done` transitions** (Any Status → Done plus In Progress → Done, same name) — editor shows a non-blocking warning; left in place, candidate for future cleanup.
+- Reporting board columns (2026-09-20): `TO DO | IN PROGRESS | IN REVIEW | PENDING | DONE`. DONE maps Done/Declined/Cancelled/Resolved/Not Applicable. Pending: no resolution, no Min/Max.
+- Editor note: drafts clear by closing the editor without publishing (no explicit Discard in new editor UI; ⋯ menu only has rename/restore). Long-lived "Contains draft" flags had leftover edits (Re-opened/Re-closed transitions) from another admin — cleared by closing, not published by us.
+
+### FINP — Finance Private
+Company-managed **software** space, key `FINP` (sensitive HR/payroll tickets). Boards: **Payroll** (Kanban), Private Reporting.
+
+- Workflow scheme: `FINP: Software Simplified Workflow Scheme` — one workflow, `Software Simplified Workflow for Project FINP`, covering ALL issue types (Story, Address Change, Bank Account Change, Benefits, Buy and Sell Vacation, Employee Info Changes/Requests, Epic, Job Level Recommendations, Maternity/Paternity Leave, Short Term Medical Leave, Task, Termination/Resignation, Sub-task).
+- Sharing: **Finance Private only** (verified 2026-09-20, safe to edit in place).
+- Statuses: Backlog (START), In Progress, Done, Not Applicable, **In Review** + **Pending** (both existing global statuses, added 2026-09-20). Every status ⚡Any transitions.
+- Payroll board columns (2026-09-20): `TO DO (maps Backlog) | IN PROGRESS | IN REVIEW | PENDING | DONE`. Set resolution ticked only on DONE's `Done` status.
+- ⚠️ Board self-reports **"simplified workflow"** despite being company-managed: its **Add column dialog asks Name + Category and creates a status if the name doesn't match an existing one** — type the exact existing status name; matching is case-insensitive (typed `PENDING` → matched existing `Pending`, no duplicate status). Clicking Add column twice creates a duplicate *empty column* — delete the empty one via its trash icon.
+- Verified live on a test ticket (In Review → Pending → back).
+
 **Other spaces/projects in the instance:** ITS (IT Services, service desk), ITSP (IT Services
-Projects), ATL (Atlas), FIN (Finance), COB (Cobalt), ABA (Abacus), AUR (Aurora), Triage, Legal,
+Projects), ATL (Atlas), COB (Cobalt), ABA (Abacus), AUR (Aurora), Triage, Legal,
 Cybersecurity (Confluence space key `CYBERPROJ`).
 
 ## Change history
@@ -103,6 +126,18 @@ Symptoms: assignee + project admin (Reggie L.) + org admin all unable to open LE
 - Org admin ≠ site admin ≠ project Browse permission — three separate layers; elevate via admin.atlassian.net (`site-admins` group) before deep debugging.
 - Project `Administrators` role does NOT bypass issue security levels; only `site-admins` do.
 - Follow-up hardening: scope `Delete Issues` permission to site admins only in shared permission schemes (accidental delete risk).
+
+### 2026-09-20 — Added "Pending" status/column to Finance Reporting board
+- Verified `Finance: Board Workflow` included in Space(s) = Finance only → edited in place.
+- Reused existing global status **Pending** (blue chip in Add-status dropdown = existing, category In Progress). Unmapped-statuses panel on the board contains lookalikes (Pending Approval / Pending Renewal / Pending Triage from other spaces) — must map the exact `Pending`.
+- Published with backup copy; mapped column PENDING between IN REVIEW and DONE, Set resolution unchecked.
+- Verified live via Active sprints view (the column view is the **Active sprints** tab — the board's default tab is Backlog, a list).
+
+### 2026-09-20 — Added "In Review" + "Pending" status/columns to Finance Private Payroll board
+- Same procedure as the Reporting board above; `Software Simplified Workflow for Project FINP` is Finance-Private-only → edited in place, published with backup.
+- Statuses: the workflow's start status is BACKLOG (board's TO DO column maps to it — different from Finance/Reporting which starts at To Do).
+- This board uses the simplified-workflow column dialog — see FINP section above for the status-matching gotcha.
+- Verified live; Unmapped panel confirmed empty after mapping.
 
 ### 2026-09-09 — Added "Compliance Request/Research" option to LEGAL intake form
 Setup discovered (reuse for future form-option requests):
