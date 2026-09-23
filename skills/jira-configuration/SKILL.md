@@ -84,6 +84,8 @@ Use `lookupJiraAccountId` for anyone not listed.
 ### FIN — Finance
 Company-managed **software** space, key `FIN`. Boards: Reporting (scrum), Collections, Discounts, Operations, Planning & Analysis.
 
+**Forms (form 713 — Employee Reimbursement Request):** creates issue type `Employee Reimbursement Request` (id 11337); builder `/jira/software/c/projects/FIN/form/713/builder`; form auto-stamps Summary as "Employee Reimbursement Request - <reporter name>". Backing fields: `Reimbursement Categories` = 11806 (radiobuttons: Team Building Spend / New Hire Lunch / T&D Support / Travel Reimbursement / Other — Travel added 2026-09-22, verified option id 14139), `Reimbursement Categories (Other)` = 11807 (its own `[Other]` branch), `Department 1/2/3` = 10397 / 11808 / 11809 (select; 28 enabled options = Finance tracking sheet incl. Interstellar, IT Infrastructure, Nova; Infrastructure→IT Infrastructure renamed in-place, option 12022; `Other` disabled on all three), `Department N (Other)` = 11810-11812 (removed from form; fields retained), `Total Reimbursement Seeking` = 11805, approver = 11466 (`helcim-ticket-approver-jc`), `Attendees — Department 1/2/3` = 13513 / 13514 / 13515 (Number, FIN-only; Attendees 2/3 sit in **nested `[Dept N = any of 28]` branches** under their parent dropdowns — that is how "required-if-selected" is achieved in native forms), `Travel expense details` = 13516 (short text, own `[Travel Reimbursement]` branch, description carries the Google Sheets template `/copy` link). Screen: fields live on the dedicated FIN screen **"Employee Reimbursement Request"**.
+
 - Workflow scheme: `FIN: Software Simplified Workflow Scheme` — **Finance-only sharing** (verified 2026-09-20, safe to edit in place). ⚠️ Yellow banner seen Sep 2026: Cloud will cap workflow schemes at 150 workflows — watch when copying.
 - **Three workflows, one per group of issue types:**
   - `Finance: Board Workflow` → Story, Bug, Epic, Task, Sub-task (drives the Reporting board)
@@ -109,6 +111,20 @@ Projects), ATL (Atlas), COB (Cobalt), ABA (Abacus), AUR (Aurora), Triage, Legal,
 Cybersecurity (Confluence space key `CYBERPROJ`).
 
 ## Change history
+
+### 2026-09-23 — Rebuilt Employee Reimbursement Request form (FIN, form 713) per Finance/TRS request
+Spec from ITSP-107 comment 75207. Three changes released together:
+1. `Travel Reimbursement` option added to `Reimbursement Categories` (11806), position 4; `[Travel Reimbursement]` branch surfaces the Google Sheets travel-expense template via the `/copy` URL so requesters duplicate instead of editing Finance's master.
+2. Department list standardized to Finance's 28 names on ALL three department fields: added Interstellar, Nova; renamed `Infrastructure`→`IT Infrastructure`; disabled Engineering, Facilities, Information Technology, Merchant Experience, Partnership, Procurement, Supply Chain, Other. Use **Disable, never Delete**, on retired options — deleting leaves blank rendering on historical issues.
+3. Paired conditional capture: `Attendees — Department N` (NEW number fields 13513/13514/13515) required exactly when Department N is chosen — implemented as nested branches `[Dept N = any of the 28 options]`. There is no "required when other question non-empty" primitive; the 28-chip branch is the workaround (chips must be re-synced if departments change).
+Verified live: FIN-6153 test ticket persisted all values (categories, 3 depts, 3 counts, total, approval routing); T&D Support cleanly shows no department UI; Dept-2-without-count submit blocks. Test ticket deleted after verification.
+
+**Form-builder gotchas worth memorizing:**
+- **Whole-form saves are atomic** (`UpdateJiraBusinessForm` GraphQL). One invalid condition reference (e.g. a condition chip pointing at a **disabled option**) makes every subsequent save 400 (`"Condition value N is not a valid field option"`) and the UI silently rolls back ALL edits — chips "snap back", deletes resurrect. Fix: temporarily re-enable the referenced options in field admin, clear/repair the conditions, delete the dead questions, then re-disable.
+- Conditional chips reference **option IDs**, so renaming options stays valid; disabling kills the reference.
+- Branches hang off the trigger card: `Add condition` exists only on discrete-answer cards (select/radio); to re-home a question use its ⋮⋮ menu → **Move to condition**.
+- **Field-visibility chain for the form palette**: field exists → member of the space's **field scheme** (FIN uses `Default Field Scheme`, 29 spaces) → on the space's **screen** (FIN's dedicated "Employee Reimbursement Request" screen). Only then it appears in the builder. Never add new fields to shared schemes' *screens* — availability vs rendering are separate layers.
+- Number/text "questions" on such forms are field-backed only; create real custom fields rather than expecting generic question tiles.
 
 ### 2026-09-04 — Added "Monitoring" status/column to Legal board (requested by Stephanie)
 Full procedure used — reuse for any future status request:
