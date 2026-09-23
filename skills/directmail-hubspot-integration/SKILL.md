@@ -77,10 +77,11 @@ update posted. History of how it got there:
   Read scope (search-before-create) — superseded by the confirmed root cause in the Sep 20
   entry below.
 - **Real lead payload keys observed (from sheet raw column):** `campaign_id`,
-  `campaign_name`, `campaign_start_date`, `campaign_end_date`, `list_name`,
-  `list_friendly_name`, `list_created_at`, `email`, + more cut off in screenshots. Placeholder
-  `F` mismatches: `campaign` should likely be `campaign_name`; per-recipient code key still
-  unknown (need one FULL raw cell paste).
+  `campaign_name` (**confirmed** — `F.campaign` must point here, one-word fix pending
+  redeploy as of Sep 21), `campaign_start_date`, `campaign_end_date`, `list_name`,
+  `list_friendly_name`, `list_created_at`, `email`, + more cut off in screenshots.
+  The test pushes look like **list-upload events** (no per-recipient code field visible) —
+  the `qr_code`-equivalent key must come from a real scan event payload.
 - **Sep 20 incident — midnight-UTC regression (confirmed root cause of the Sep-18 write
   failures):** the deployed Version 3 script sent `last_qr_scan_timestamp:
   new Date().toISOString()` (time-of-day included) → every HubSpot write was rejected with

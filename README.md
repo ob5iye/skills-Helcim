@@ -20,6 +20,7 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 - `jira-configuration` — Helcim Jira environment: projects, workflows, statuses, forms, automation flows, boards, service accounts
 - `helcim-psso-playbook` — Okta Platform SSO / Desktop Password Sync on macOS via Jamf Pro
 - `directmail-hubspot-integration` — Directmail.io QR-scan webhook → HubSpot via Google Apps Script receiver (no Ops Hub Pro / Zapier)
+- `jsm-ticket-writer` — paste a raw issue, get an ITS (JSM) ticket: plain text (no colons/hyphens/semicolons), minimal wording, assigned to Abdi via MCP
 
 **Hacks**
 - `helcim-zero-touch` — 9-file Okta PSSO + Jamf + Netskope master archive (inject `00-PROJECT-MEMORY.md` first) + Swift tools
