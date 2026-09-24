@@ -38,3 +38,26 @@ If the messages come from *other* senders and still skip the Inbox, a filter is 
 Open a few of the All Mail messages and check the sender. From the member themselves → Cause 1. From other people → Cause 2.
 
 **Source:** https://support.google.com/a/answer/1703601
+
+---
+
+## Mail merge blocked: "External recipients not allowed"
+
+**Symptom:** User composes a mail merge (purple banner, `@firstname` tags) and gets "Your administrator has not allowed multi-send to recipients outside the organization."
+
+**Cause:** The **Allow for external recipients** checkbox is **off by default on Enterprise edition**. Mail merge itself is on, but external sending is blocked.
+
+**Fix (Admin console):**
+
+1. admin.google.com → **Apps → Google Workspace → Gmail → User settings**
+2. Select the sender's OU in the left panel (do NOT enable org-wide)
+3. Pencil icon on the **Mail merge** card → check **Allow for external recipients → Override → Save**
+4. Sender hard-reloads Gmail, retries in a few minutes (worst case up to 24h)
+
+**Gotchas:**
+
+- The override only applies if the sender's account is actually in that OU — verify in Directory → Users.
+- Limits: 1,500 mail merge recipients/day, 500 external per message, 2,000 unique external/day.
+- Unsubscribes are handled by mail merge automatically — always keep the merge in merge mode.
+
+**Helcim config (2026-09-24):** Enabled **Mail merge → Allow for external recipients** as an override on the **Exec No Public Cal** OU only (inherited=off at Helcim Inc. root), for Nic's personal "No Hidden Fees" newsletter send. Long-term recommendation: exec newsletters should move off the corporate domain (e.g. Ghost on nicbeique.com) to protect helcim.com sender reputation.
