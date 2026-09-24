@@ -61,3 +61,31 @@ Open a few of the All Mail messages and check the sender. From the member themse
 - Unsubscribes are handled by mail merge automatically — always keep the merge in merge mode.
 
 **Helcim config (2026-09-24):** Enabled **Mail merge → Allow for external recipients** as an override on the **Exec No Public Cal** OU only (inherited=off at Helcim Inc. root), for Nic's personal "No Hidden Fees" newsletter send. Long-term recommendation: exec newsletters should move off the corporate domain (e.g. Ghost on nicbeique.com) to protect helcim.com sender reputation.
+
+---
+
+## Group alias can't receive external email (vendor notifications bounce)
+
+**Symptom:** An external sender (bank, vendor, monitoring service) emails a group alias like `dev-payments-team@helcim.com` and the message never reaches members — bounces or vanishes. (ITS-808: JPM notification emails.)
+
+**Cause:** Two settings gate external posting, one per level:
+
+1. **Org level (Admin console):** *Groups for Business → Sharing settings → "Group owners can allow incoming email from outside the organization"* — **unchecked by default**. If off, group owners can't enable external posting at all, and inbound external mail sits in a moderation queue for owner approval.
+2. **Group level (Google Groups):** the group's own *Who can post* doesn't include External.
+
+**Fix:**
+
+1. admin.google.com → **Apps → Google Workspace → Groups for Business → Sharing settings** → check **Group owners can allow incoming email from outside the organization** → Save (one-time, org-wide).
+2. groups.google.com → open the group → **Group settings → General**:
+   - Simple view: set **Who can post = Anyone on the web**.
+   - Custom access matrix: check **External** on the **"Who can post"** row only.
+3. Leave External **unchecked** for *Who can view conversations* and *Who can view members* — external senders only need to post; they shouldn't see the member list or archive.
+
+**Gotchas:**
+
+- If the External checkboxes are greyed out or missing in group settings, the org-level toggle is off — do step 1 first, then revisit the group.
+- Posting by email ≠ membership: external **senders** do NOT need "Group owners can allow external members" — that setting is for adding outsiders as group members. Keep it off.
+- Opening a high-traffic team alias to the whole web invites spam/phishing into everyone's inbox. Prefer a **dedicated vendor alias** (e.g. `jpm-notifications@helcim.com`) with external posting on, and keep the team alias internal-only.
+- Group-level changes apply on Save; org-level sharing changes can take a few minutes to propagate.
+
+**Helcim config (2026-09-24, ITS-808):** Org-level sharing toggle already on (External boxes editable in group settings). Payments team needed JPM settlement/notification emails delivered to the whole team — fix is checking **Who can post → External** for `dev-payments-team@helcim.com` (or spinning up a dedicated vendor alias if opening the team alias proves too spammy).
