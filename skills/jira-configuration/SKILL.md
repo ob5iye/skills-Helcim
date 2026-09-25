@@ -108,9 +108,18 @@ Company-managed **software** space, key `FINP` (sensitive HR/payroll tickets). B
 
 **Other spaces/projects in the instance:** ITS (IT Services, service desk), ITSP (IT Services
 Projects), ATL (Atlas), COB (Cobalt), ABA (Abacus), AUR (Aurora), Triage, Legal,
-Cybersecurity (Confluence space key `CYBERPROJ`).
+Cybersecurity (Confluence space key `CYBERPROJ`), MKT (**Marketing**, id 12217, classic
+company-managed software — distinct from MOP **Marketing Ops**, id 12218).
 
 ## Change history
+
+### 2026-09-25 — Goals: already live instance-wide; "enable Goals for Marketing" needed no change (ITS-806)
+Request via JSM portal (ITS-806, reporter Jason Hale, approver Jeff Newfeld): "Marketing would like to explore using Goals... enable it for the Marketing Space."
+- **Goals is site-entitled and already attached to the MKT space nav bar** (tab row: Summary | Timeline | Kanban board | ... | Goals | Shortcuts | Docs). Rendered an empty state ("you haven't linked any goals yet") = working product, no config.
+- **Where Goals lives (memorize):** per-space it is added via the **space nav tab bar "+" picker** (or pre-added), NOT Space settings → Features — on classic spaces that page only lists toggles like Standups. Check the tab bar first on any future "enable Goals" request.
+- **Linking surfaces:** epic/work-item header **Link goals** chip; the **Goals field** (work item → Configure → Fields panel → drag Goals into Context fields — also appears as a List-view column); org-wide Goals directory via "View goals" (Atlassian Home).
+- Empty state = data problem, not config: someone must create/link a first goal. MKT's Q3 epics on the board ("Q3 - Discoverability...") are the natural first links.
+- No changes made; ticket handled as verify + explain.
 
 ### 2026-09-23 — Rebuilt Employee Reimbursement Request form (FIN, form 713) per Finance/TRS request
 Spec from ITSP-107 comment 75207. Three changes released together:
