@@ -109,6 +109,23 @@ concern if they ever batch in the hundreds), (3) HubSpot token rotation + test-c
 cleanup (see status bullet above). Vendor behavior: sends are batched, one push carries
 multiple lead objects.
 
+## List delivery to the vendor (Sep 25, 2026)
+
+Campaign lists go TO Directmail.io via their SFTP drop — the vendor does not collect them:
+
+- Endpoint `sftp.directmail.io:22` (proper SFTP). Accounts are per-user (e.g.
+  `foladipo-helcimproductmarketing`); creds come in a protected vendor email (no
+  forward/copy/download, content expires ~1 week — re-request a fresh drop when needed,
+  and never store the password in this repo).
+- Login lands chrooted in `/dm-ftp/helcim/`. Upload the campaign CSV there (spaces in the
+  filename are tolerated). First upload Sep 25 for ITS-809:
+  `helcim_existing_merchants_healthcare_verticals - Merchant List.csv` — 1,892 rows,
+  `Company Name / Domain / Industry / City / State` (NO email column: it is a
+  direct-mail audience, so scan attribution still relies on the per-recipient QR code,
+  not list emails).
+- On macOS: stock curl lacks SFTP; use built-in `sftp` driven by `/usr/bin/expect` for the
+  password prompt (`-o StrictHostKeyChecking=accept-new` skips the host-key prompt).
+
 ## Build steps
 
 1. **Create a Google Sheet** ("QR Scan Log") → `Extensions → Apps Script` → paste the script
