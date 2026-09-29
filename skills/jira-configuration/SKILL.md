@@ -119,7 +119,7 @@ Request via JSM portal (ITS-806, reporter Jason Hale, approver Jeff Newfeld): "M
 - **Where Goals lives (memorize):** per-space it is added via the **space nav tab bar "+" picker** (or pre-added), NOT Space settings → Features — on classic spaces that page only lists toggles like Standups. Check the tab bar first on any future "enable Goals" request.
 - **Linking surfaces:** epic/work-item header **Link goals** chip; the **Goals field** (work item → Configure → Fields panel → drag Goals into Context fields — also appears as a List-view column); org-wide Goals directory via "View goals" (Atlassian Home).
 - Empty state = data problem, not config: someone must create/link a first goal. MKT's Q3 epics on the board ("Q3 - Discoverability...") are the natural first links.
-- No changes made; ticket handled as verify + explain.
+- **Visibility is per-user via product access** (day-two finding): Jason could see the Goals tab, Kaitie Weaver could not. Compared admin.atlassian.com user pages — Jason has a **"Goals" app row (Free plan, User role)**; Kaitie has only Confluence/JSM/Jira. **Fix: grant Goals product access** (Users → user → "Grant app access" → Goals → User role; zero cost, Free plan). After grant: hard refresh; tab appears (or add via the tab bar "+" picker). **Resolution: granted Goals (Free, User role) to the IdP-synced "Marketing" group (6 members) in admin.atlassian.com (Directory → Groups → group → Apps → Add app). Chose group grant over site-wide auto-grant — membership lifecycle stays in Okta, so new Marketing hires inherit Goals automatically.**
 
 ### 2026-09-23 — Rebuilt Employee Reimbursement Request form (FIN, form 713) per Finance/TRS request
 Spec from ITSP-107 comment 75207. Three changes released together:
@@ -364,13 +364,43 @@ plain condition works.
 ## Service accounts & integrations
 
 - **Service accounts** live at admin.atlassian.net → Directory → Service accounts (Guard feature: no password, no SSO/Okta dependency, no mailbox, unaffected by HiBob lifecycle).
+- Service-account API tokens are created **inside the service account's detail page** in admin.atlassian.com — NOT at id.atlassian.com (that page only holds personal tokens tied to the signed-in human, inheriting all their rights, dying with their account).
 - Existing: `Jira-Integrations` — has **4 API token credentials** = likely multiple integrations sharing one identity (known tech debt; audit and split over time).
+- Existing: `Jellyfish` (`jellyfish-ol7jhe9vmy@serviceaccount.atlassian.com`, 2 credentials) — engineering-analytics vendor, seen 2026-09-28; not set up by IT, owner unknown.
 - Added 2026-09-01: **`AI-Document-Reviewer`** (`ai-document-reviewer-ent63hhwe1@serviceaccount.atlassian.com`) for the AI document reviewer bot; API token `ai-doc-reviewer-prod`, expires **2026-09-01 + 1yr (Sep 01 2027)** — calendar rotation ~2 weeks prior. Jira app role = User; project permissions: Browse + Add Comments only. Migration done when token's "Last used" flips from "Never used" → then revoke the old shared credential on Jira-Integrations.
+- Added 2026-09-28: **`Remote-Agents`** (`remote-agents-fd491376bg@serviceaccount.atlassian.com`) for Noah Adams' remote agent toolkit (replaces his personal API token). Jira app role = User only (no Confluence/JSM/other apps). API token `remote-agents-prod`, scopes read:jira-work + write:jira-work, expiry 1 yr (~Sep 28 2027) — rotation reminder ~2 weeks prior. Credentials delivered to Noah via 1Password (email + token; basic auth). Scope: full R/W on all Product and Engineering category spaces via open permission schemes (see audit below); **NAW requires Noah to add the account to the project's Member role** (team-managed, locked down). Scoped-token gotcha flagged to Noah: on 401 against helcim.atlassian.net use gateway `https://api.atlassian.com/ex/jira/5b0727ab-0d7a-42ea-8f77-6d56032fab31/...`.
 - **Credential creation choices**: API token vs OAuth 2.0 — pick API token when the tool uses basic auth (`email:token`); OAuth 2.0 only if their code implements the flow. Scoped tokens may require the gateway URL `https://api.atlassian.com/ex/jira/{cloudId}/...` instead of the site URL — flag this to integration owners.
 - Scope minimal: read:jira-work + write:jira-work (classic) is the safe granular-equivalent set for read-issues/post-comments bots.
+
+## Project categories & permission schemes (audited 2026-09-28)
+
+- **Project category "Product and Engineering" (id 10000)** groups the tech-team spaces. Members after 2026-09-28: ABA, ALF, APL, ATL, AUR, COB, ISTL, MER, NOV, PROD, TRI, **PENG, FND** (last two added via API for the remote-agents scoping request; NAW and ECT deliberately left out). Agents/filters can use `category = "Product and Engineering"` instead of hardcoded project whitelists — self-updates when projects join the category.
+- Category is set via `PUT /rest/api/3/project/{key}` body `{"categoryId": 10000}` (no MCP tool; needs admin API token). Categories are query/grouping only — **not** a permission boundary.
+- **Permission schemes on the tech projects:**
+  - `Default software scheme` (id 10037) — used by FND, ATL, ALF, NOV, MER, ISTL, COB, AUR, ABA, APL, PROD, ECT: Browse/Create/Edit/Comment/Transition/Assign/Resolve all granted to **ANY LOGGED-IN USER**. Any account with Jira product access has full R/W here.
+  - `PAPO: Default Permission Scheme` (id 10565) — TRI: same, everything ANY LOGGED-IN USER.
+  - `DSR: Permission Scheme` (id 11285) — PENG: same, everything ANY LOGGED-IN USER.
+  - `NAW: Simplified Permission Scheme` (id 12350) — NAW (Noah's Agentic Workspace, team-managed): Browse + Comment open to any logged-in user, but **Create/Edit/Transition/Assign/Resolve require project role Administrator or Member** — bots need to be added to the project's Member role.
+- Practical consequence: a service account with just the Jira User role already has full R/W on every tech-team space except NAW.
+- **Personal admin API token for Devin API work**: classic token (NOT scoped) from id.atlassian.com → Security → API tokens, saved at `~/.atlassian-api-token` (chmod 600); basic auth `aobsiye@helcim.com:<token>` against `https://helcim.atlassian.net`. Never paste tokens into chat. The old Slite-migration token (in `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env`) is revoked/dead — file can be deleted.
+
+## Change history (continued)
+
+### 2026-09-28 — Remote-Agents service account + PENG/FND added to Product and Engineering category (request from Noah Adams)
+Noah's remote agents needed R/W to all tech-team spaces; he was testing on his personal API token. Whitelist he supplied: TRI, NAW (his test space), PENG, FND, ATL, ALF, NOV, MER, ISTL, COB, AUR, ABA, APL ("ENG" doesn't exist — closest is ECT). Work done:
+1. Verified all keys via `getVisibleJiraProjects`; discovered the existing **"Product and Engineering" project category (id 10000)** already grouped 11 of them (plus PROD, minus PENG/FND/NAW).
+2. Audited permission schemes on all 15 candidate projects via personal admin token (no MCP tools for schemes) — results in the audit section above. 14/15 fully open to any logged-in user; NAW is role-gated.
+3. Added **PENG and FND to the category** via `PUT /rest/api/3/project/{key}` `{"categoryId": 10000}` (both previously uncategorized — nothing overwritten; category change is metadata-only, zero permission/board/workflow impact; only effect is category-based JQL filters now include them).
+4. Created the **Remote-Agents** service account (details in Service accounts section). Noah's agents query `category = "Product and Engineering"` instead of a hardcoded whitelist.
+Caveat given to Noah: the category is a convention, not a fence — the token can touch any open project; the whitelist lives in his query logic.
 
 ## Open items
 
 - [ ] AI-Document-Reviewer: confirm team cutover (Last used flips), then revoke its old token from Jira-Integrations.
 - [ ] Audit Jira-Integrations' 4 credentials → identify consumers, plan split.
 - [ ] Token rotation reminder ~Aug 15 2027 (AI-Document-Reviewer).
+- [ ] Token rotation reminder ~Sep 14 2027 (Remote-Agents `remote-agents-prod`).
+- [ ] Remote-Agents: confirm Noah added it to NAW's Member role and his agents cut over off his personal token.
+- [ ] Identify owner of the `Jellyfish` service account (2 credentials, not set up by IT).
+- [ ] Delete stale dead-token file `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env` (needs user confirmation).
+- [ ] Revoke/let expire the personal `devin-local-admin` token at id.atlassian.com when admin API work wraps up (`~/.atlassian-api-token`).
