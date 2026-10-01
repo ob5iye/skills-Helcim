@@ -95,6 +95,16 @@ update posted. History of how it got there:
   HubSpot contacts created (e.g. `fcronin@wehner.net`, 10:22 AM via "QR Scan Webhook
   Receiver", company auto-associated from domain). Sheet QR Code/Campaign columns still blank
   pending `F` finalization.
+- **Oct 1 — identity mystery solved (v5 script):** pasted one full raw sheet cell. Production
+  scan/PURL events carry `recipient_id`, `first_name`, `last_name`, `business_name`,
+  `telephone_number`, `entry_method: "PURL"` — and `email: ""` EMPTY. The audience is a
+  postal mail list; **identity = `recipient_id`, NOT email** (Jared's Sep-28 row had email
+  only because the old test list included it). `F` finalized: `code: 'recipient_id'`,
+  `campaign: 'campaign_name'`. v5 also creates contacts with firstname/lastname/company/phone
+  (create-path only — updates never overwrite those), skips HubSpot writes for personless
+  metadata events, and logs per-record results (`Logger.log`) so failures show in Executions.
+- **Junk cleanup needed:** HubSpot filter `qr_scan_count` is known AND Email is unknown →
+  ~12 blank contacts created from Sep-18/28 metadata events → delete all.
 - Cleanup pending: delete from HubSpot the blank Sep-18 contact, `demo.scanner@helcim-test.com`,
   Sep-20 `livescan@test.com` (ID 249609734180), and the Sep-18/21 vendor-test contacts once
   the team has seen them. **Rotate the HubSpot private app token** (it appeared in a chat
@@ -102,12 +112,14 @@ update posted. History of how it got there:
 
 ## Remaining open items
 
-End-to-end verified working (Sep 21). Still open:
-(1) paste one FULL raw sheet cell from a production scan to finalize `F` (`campaign_name`
-mapping + the per-recipient code key + name fields), (2) max leads per push (payload-size
-concern if they ever batch in the hundreds), (3) HubSpot token rotation + test-contact
-cleanup (see status bullet above). Vendor behavior: sends are batched, one push carries
-multiple lead objects.
+`F` finalized from a real production payload (Oct 1). Still open:
+(1) deploy v5 and verify a live scan creates a named contact, (2) max leads per push
+(payload-size concern if they ever batch in the hundreds), (3) HubSpot token rotation +
+test/junk contact cleanup (see status bullets above), (4) optional pre-load of the 51k
+mail list into HubSpot keyed by `recipient_id` so contacts exist before scanning —
+marketing call, the script auto-creates scanners regardless.
+Vendor behavior: sends are batched, one push carries multiple lead objects; postal
+audiences carry no emails, `recipient_id` is the join key.
 
 ## List delivery to the vendor (Sep 25, 2026)
 
@@ -149,13 +161,13 @@ Campaign lists go TO Directmail.io via their SFTP drop — the vendor does not c
 ## The script
 
 ```javascript
-// ===== FIELD MAPPING — provisional until a real per-scan payload is confirmed =====
+// ===== FIELD MAPPING — confirmed from production payload Oct 1, 2026 =====
 const F = {
-  email:    'email',     // key in their JSON holding recipient email
-  code:     'qr_code',   // key holding the unique per-recipient QR/pURL code
-  campaign: 'campaign',  // key holding campaign name (optional)
+  email:    'email',         // often empty — postal lists carry names/phones, not emails
+  code:     'recipient_id',  // unique per-recipient key = PURL identity
+  campaign: 'campaign_name',
 };
-// ===========================================================================
+// ==========================================================================
 
 function doPost(e) {
   try {
@@ -175,6 +187,7 @@ function doPost(e) {
 
     const records = Array.isArray(data) ? data : [data]; // vendor batches leads per push
     const results = records.map(processRecord_);
+    Logger.log(JSON.stringify(results));
     return json_({status: 'ok', received: records.length, results: results});
   } catch (err) {
     return json_({status: 'error', message: String(err)});
@@ -188,6 +201,8 @@ function doGet() {
 
 function processRecord_(data) {
   logToSheet_(data);
+  // Personless events (campaign/list summaries) log to the sheet but never touch HubSpot
+  if (!data[F.email] && !data[F.code]) return {skipped: 'no email or code in payload'};
   try {
     return upsertHubSpotContact_(data);
   } catch (err) {
@@ -226,9 +241,18 @@ function upsertHubSpotContact_(data) {
 
   const createProps = Object.assign({qr_scan_count: 1}, props);
   if (email) createProps.email = email;
-  if (code) createProps.qr_code = code;
+  if (code) createProps.qr_code = String(code);
+  if (data.first_name) createProps.firstname = data.first_name;
+  if (data.last_name) createProps.lastname = data.last_name;
+  if (data.business_name) createProps.company = data.business_name;
+  if (data.telephone_number) createProps.phone = formatPhone_(data.telephone_number);
   const res = hsFetch_(token, 'post', '/crm/v3/objects/contacts', {properties: createProps});
   return {created: res.id};
+}
+
+function formatPhone_(digits) {
+  const d = String(digits).replace(/\D/g, '');
+  return d.length === 10 ? '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6) : String(digits);
 }
 
 function findContactId_(token, property, value) {
