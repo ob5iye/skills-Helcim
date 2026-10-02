@@ -38,12 +38,25 @@ cancellation (Oct 5, 2026). Requested by Joanna Wynn.
   not available on Business plan. Videos must be downloaded manually from the
   UI per recording if needed.
 
-## Result (2026-09-29)
+## Result
 
+Phase 1 (2026-09-29, Joanna only):
 - 394 recordings (377 with transcripts, 390 with AI notes), 3,406 notes
-- Output: `~/Documents/Devin/fellow-export/` — `raw/` (canonical JSON),
-  `transcripts/` (394 txt), `notes_only/` (14 txt), `bundles_monthly/`
-  (25 monthly files), plus dated zip archive
-- Destination: Google Drive + NotebookLM (25 monthly bundles fit the free
-  50-source cap)
-- Cleanup after: delete the API key from Joanna's Developer Tools
+
+Phase 2 (2026-10-02, added Tom Edworthy + Lybie De Leon via `export_user.py`,
+which dedupes against all previously exported ids):
+- Tom: 799 visible recordings, 688 new; 2,679 new notes
+- Lybie: 564 visible, 346 new; 2,354 new notes
+- **Merged total: 1,428 unique recordings, 8,439 notes** (Sept 2024 – Oct 2026)
+
+- Output: `~/Documents/Devin/fellow-export/` — `raw/` (canonical JSON, per-user
+  files), `transcripts/` (1,428 txt), `notes_only/` (39 txt),
+  `bundles_monthly/` (26 monthly files),
+  `fellow-export-COMPLETE-20261002.zip` (54 MB canonical archive)
+- Destination: Corporate IT shared drive + NotebookLM notebook
+  "Partnerships – Fellow Meeting Archive (2024–2026)" (26 monthly bundles,
+  shared per-person as Viewers)
+- Caution: merged archive includes exec/SLT/finance meetings and 1:1s —
+  curate before sharing beyond Joanna/IT
+- Cleanup after: delete all three API keys from each user's Developer Tools
+  (Tom's and Lybie's keys were exposed in chat — deletion mandatory)
