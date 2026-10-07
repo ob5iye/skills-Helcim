@@ -15,6 +15,7 @@ Work repo lives at `~/Documents/Devin/skills-Helcim/`. Route first, answer secon
 | Okta Platform SSO, Jamf Pro deploys, zero-touch, Netskope | `/helcim-psso-playbook` skill + `hacks/helcim-zero-touch/` (inject `00-PROJECT-MEMORY.md` first) |
 | Direct mail / HubSpot webhook integration | `/directmail-hubspot-integration` skill |
 | Gmail logs, Workspace admin, Lingo SSO, laptop compliance, Apple test accounts | matching folder under `runbooks/` |
+| Chrome extensions (EDD Note Builder, Web Store publisher `fuzz@helcim.com`) | `runbooks/chrome-extensions/README.md` |
 
 `skills-Helcim/README.md` has the full inventory if none of the above fit.
 

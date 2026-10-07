@@ -89,3 +89,17 @@ Open a few of the All Mail messages and check the sender. From the member themse
 - Group-level changes apply on Save; org-level sharing changes can take a few minutes to propagate.
 
 **Helcim config (2026-09-24, ITS-808):** Org-level sharing toggle already on (External boxes editable in group settings). Payments team needed JPM settlement/notification emails delivered to the whole team — fix is checking **Who can post → External** for `dev-payments-team@helcim.com` (or spinning up a dedicated vendor alias if opening the team alias proves too spammy).
+
+---
+
+## Chrome Web Store publisher (fuzz@helcim.com)
+
+The Workspace service account **`fuzz@helcim.com`** (Helcim Fuzz) is Helcim's Chrome Web Store publisher. It owns two private (domain-restricted) extensions used by Trust & Safety / Credit Risk: **Autogenerating EDD Note Builder** and **Credit Risk EDD Note Builder**.
+
+Full details — item IDs, update procedure, packaging gotchas — live in **`runbooks/chrome-extensions/README.md`**.
+
+Key reminders:
+
+- Dashboard: https://chrome.google.com/webstore/devconsole (sign in as `fuzz@helcim.com`, publisher `fuzz`) — this is NOT Google Play.
+- Uploads need `manifest.json` at the **zip root** (Drive folder downloads nest it — repackage) and a version **higher** than the published one.
+- Last update: 2026-09-29, Autogenerating EDD Note Builder 0.0.0.1 → 0.0.2.

@@ -281,13 +281,14 @@ function json_(obj) {
 }
 
 // Run this from the editor to test without Directmail.io
+// Run from the editor to test without Directmail.io — mirrors a real Helcim 1A record
+// (token pulled from Script Properties so the WEBHOOK_SECRET check passes)
 function testDoPost() {
   const fake = {
-    parameter: {},
+    parameter: {token: PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET')},
     postData: {contents: JSON.stringify([
-      {email: 'test1@example.com', qr_code: 'TEST-001', campaign: 'Fall2026'},
-      {email: 'test2@example.com', qr_code: 'TEST-002', campaign: 'Fall2026'},
-      {email: 'test3@example.com', qr_code: 'TEST-003', campaign: 'Fall2026'},
+      {email: '', recipient_id: 999000001, first_name: 'Test', last_name: 'One', business_name: 'Test Co', telephone_number: '4035550001', campaign_name: 'Helcim 1A'},
+      {email: '', recipient_id: 999000002, first_name: 'Test', last_name: 'Two', business_name: 'Test Co 2', telephone_number: '4035550002', campaign_name: 'Helcim 1B'},
     ])},
   };
   Logger.log(doPost(fake).getContent());
@@ -321,6 +322,10 @@ function testDoPost() {
   `-X POST`, `--post302`, or replaying the googleusercontent echo URL manually all fail
   (411 Length Required / 405 / Drive "unable to open the file"). A GET with no body hits
   `doGet` and returns the health-check JSON.
+- **testDoPost returns `unauthorized` when WEBHOOK_SECRET is set** unless the fake event
+  carries the token — build it as
+  `parameter: {token: PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET')}`
+  so the guard path itself gets exercised.
 - **Field mapping block `F` is a placeholder** until the real payload arrives. Matching
   order matters: search by `qr_code` first, fall back to `email`.
 - **Quotas:** free Gmail accounts cap `UrlFetchApp` at ~20k calls/day; each scan costs 2–3
