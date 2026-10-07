@@ -18,6 +18,14 @@ Living record of Helcim's Jira setup and every admin change we make. Append new 
 - Org has **Atlassian Guard** (real Service accounts feature exists under admin.atlassian.net → Directory → Service accounts).
 - In the current UI, projects are presented as **"Spaces"** and automation rules are called **"Flows"**.
 
+## External collaboration — Jira guest access (verified 2026-10-07)
+
+- Native **free guest access** exists (Standard/Premium/Enterprise): up to **5 guests per paid user**, no licenses consumed. Two-step: site admin invites (⚙️ → User management → Invite users → Roles → **Guest**), then space admin adds guest to the space (guests must accept first).
+- A guest belongs to **exactly one space per site** and sees nothing outside it — immune to our open "any logged-in user" schemes. Guest lozenge shown; no global perms; externals only (no @helcim.com, no current/former paid users).
+- **Never add external guests to an existing internal space** (OPS holds merchant DBA names, MIDs, card-scheme PDFs). Pattern: dedicated partner space + extend the internal board's saved filter to span both projects + map the new statuses to columns.
+- Guests are non-managed Atlassian accounts (outside Okta/HiBob) → manual offboarding; keep a guest registry with review/expiry dates.
+- Full reusable playbook: **`elavon-partner-space-plan.md`** (this folder).
+
 ## Jira concepts learned (how they fit together)
 
 - **Status ≠ board column.** A status exists only when added to a *workflow*; a card appears on the board only when the status is *mapped to a column* (board → Configure board → Columns). Unmapped status = invisible on board.
@@ -394,8 +402,12 @@ Noah's remote agents needed R/W to all tech-team spaces; he was testing on his p
 4. Created the **Remote-Agents** service account (details in Service accounts section). Noah's agents query `category = "Product and Engineering"` instead of a hardcoded whitelist.
 Caveat given to Noah: the category is a convention, not a fence — the token can touch any open project; the whitelist lives in his query logic.
 
+### 2026-10-07 — Elavon external collaboration: decision + prep (no Jira changes yet)
+Miranda Russell asked about sharing Jira externally (their Asana precedent: a dedicated "Michelin" space). Landed on: dedicated **Elavon** space (key `ELV`, verified free — no project matches "elav"), Elavon contacts as free **guests** (native Atlassian guest access), and Miranda's Card Brands board saved filter extended to `project in (OPS, ELV)` so partner items land in her existing view. Explicitly ruled OUT adding guests to OPS: guest scope = whole space, and OPS exposes merchant DBA names, MIDs, card-scheme registration PDFs, other vendor epics. Recommended **team-managed Private** space for maximum config isolation; company-managed with simplified workflow documented as Plan B. Full executable runbook incl. security checklist, guest registry, verification, rollback: **`elavon-partner-space-plan.md`** (this folder). Awaiting Miranda's go-ahead after her Elavon discussion this week.
+
 ## Open items
 
+- [ ] **Elavon partner space + guest access** — plan ready in `elavon-partner-space-plan.md` (this folder); awaiting Miranda's go-ahead (partner discussion week of Oct 7, 2026). Then: invite guests → create space → add to space → extend Card Brands board filter → verify → fill guest registry.
 - [ ] AI-Document-Reviewer: confirm team cutover (Last used flips), then revoke its old token from Jira-Integrations.
 - [ ] Audit Jira-Integrations' 4 credentials → identify consumers, plan split.
 - [ ] Token rotation reminder ~Aug 15 2027 (AI-Document-Reviewer).
