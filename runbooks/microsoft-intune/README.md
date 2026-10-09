@@ -60,6 +60,15 @@ Company Portal → Check access → compliance flips Conflict → Compliant;
 `Device Lock` conflict count drains 36 → 0 as machines check in. Spot-check a
 couple of Production devices before calling it done.
 
+## Microsoft 365 Business Standard → E3 (no Teams) migration (2026-10-07)
+
+- Entra assigned security group `lic-m365-e3` has 31 members; the group is assigned **Microsoft 365 E3 (no Teams)**. This includes the Microsoft 365 desktop apps and Intune Plan 1; Intune Plan 2 is a separate add-on.
+- The 30-person Business Standard (no Teams) export was used to add 29 new members via Microsoft Graph (one was already a member); Connor was already in the group. The Entra bulk-import UI rejected both the original license export and a converted CSV with a generic submission error.
+- Group licensing initially reported `MutuallyExclusiveViolation` / "Conflicting services" for 30 users with direct Business Standard. Do not assume a long delay is merely portal caching: inspect a user's `licenseAssignmentStates` and the product's **Errors & issues** page. The pilot who did not have Business Standard had already received E3 while still holding standalone Intune Plan 1, so **Intune Plan 1 was not proven to be the conflict**.
+- Direct Business Standard assignments were removed during the cutover (manual batches, then the remaining users via Graph). The E3 error count subsequently cleared **without a successful manual reprocess API call**. Final admin-center screenshots: **31/45 E3 assigned; licensing errors 0; members without licenses 0; Business Standard 0/33 assigned**. The product totals confirm the license cutover; spot-check a few users to confirm E3 is inherited from `lic-m365-e3` and key Office/Intune workflows still work.
+- **Do not bulk-remove standalone Intune Plan 1**: only some holders are in the E3 group. Keep existing Intune Plan 1 and Plan 2 assignments until each affected user's coverage and the original assignment source have been checked. In particular, do not remove licensing from critical users merely to clear an E3 conflict when the pilot demonstrates Intune Plan 1 can coexist.
+- No Azure subscription was available for Cloud Shell; Microsoft Graph PowerShell ran locally on macOS with delegated device-code sign-in. The tenant's E3 SKU part number is `Microsoft_365_E3_(no_Teams)` (not `SPE_E3`); use the SKU ID returned by Graph rather than assuming a generic E3 part number. Authentication failures and failed Graph commands are **not** evidence that a licensing operation completed.
+
 ## Hard-won rules
 
 - **ONE owner per CSP area.** Never let a Device restrictions template profile

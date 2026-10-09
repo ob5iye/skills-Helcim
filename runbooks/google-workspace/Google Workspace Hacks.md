@@ -4,6 +4,31 @@ A running collection of fixes and tips for Gmail, Groups, Calendar, and other Wo
 
 ---
 
+## GAM7 — CLI admin access (installed 2026-10-09)
+
+GAM7 is installed on Abdi's Mac at `~/bin/gam7/gam` with config/cache in `~/.gam/` (contains `client_secrets.json`, `oauth2.txt`, `oauth2service.json` — **never commit these**).
+
+**GCP wiring:** Reuses the existing `it-services-474319` GCP project ("IT Services") — GAM could not create a new project because no one held org-level `resourcemanager.projects.create` (Workspace super admin ≠ GCP org admin; project creation is denied org-wide). The service account is `it-services-474319@it-services-474319.iam.gserviceaccount.com` (Client ID `113094367552118324360`) with full domain-wide delegation (42 scopes). The OAuth client (`604434694659-rmfceqq453cvrgj9reklpne8jg4p6uaf`) is an Internal desktop app, trusted in Admin console → App access control. An older unused desktop client (`...9uhndkrem...fqssdg0`) was replaced during setup and can be deleted from GCP if it's still listed.
+
+**Authorized as:** `aobsiye-admin@helcim.com` (DwD) / `aobsiye@helcim.com` (client OAuth).
+
+**Verify health:** `gam user aobsiye@helcim.com check serviceaccount` — should print "All scopes PASSED!".
+
+**Useful reports:**
+```bash
+gam print teamdrives            # all shared drives + restrictions
+gam print teamdriveacls         # membership/roles per shared drive
+gam print users all             # full user directory
+gam print groups all
+gam print group-members group <group@helcim.com>
+gam user <user> print filelist fields id,name,parents   # per-user Drive listing
+gam info domain                 # customer ID C02twm3z6, 245 users
+```
+
+**Update GAM:** `gam version battlereport` or rerun the installer script from gam-shortn.appspot.com.
+
+---
+
 ## Group emails land in "All Mail" instead of the Inbox
 
 **Symptom:** A member of a Google Group (e.g. `compliance@helcim.com`) is subscribed to "Each email" and is receiving every message, but the messages skip the Inbox and land in All Mail.
