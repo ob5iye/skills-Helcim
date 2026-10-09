@@ -405,6 +405,14 @@ Caveat given to Noah: the category is a convention, not a fence — the token ca
 ### 2026-10-07 — Elavon external collaboration: decision + prep (no Jira changes yet)
 Miranda Russell asked about sharing Jira externally (their Asana precedent: a dedicated "Michelin" space). Landed on: dedicated **Elavon** space (key `ELV`, verified free — no project matches "elav"), Elavon contacts as free **guests** (native Atlassian guest access), and Miranda's Card Brands board saved filter extended to `project in (OPS, ELV)` so partner items land in her existing view. Explicitly ruled OUT adding guests to OPS: guest scope = whole space, and OPS exposes merchant DBA names, MIDs, card-scheme registration PDFs, other vendor epics. Recommended **team-managed Private** space for maximum config isolation; company-managed with simplified workflow documented as Plan B. Full executable runbook incl. security checklist, guest registry, verification, rollback: **`elavon-partner-space-plan.md`** (this folder). Awaiting Miranda's go-ahead after her Elavon discussion this week.
 
+### 2026-10-09 — ITS-839 Confluence space access request (Access Request +1 Manager Approval flow, fulfilled)
+Stephanie Davis (Head of Compliance) requested "Jira Software (Jira)" access to "Jira Project: Product Development Hub" with role "Project Customer" to comment on Bryce's draft doc. Learnings:
+- **"Product Development Hub" is a Confluence space, not a Jira project** — not in the visible Jira project list at all (search returned 0). The Access Request form's "Jira Project" dropdown can name Confluence spaces; don't assume the target is a Jira project.
+- **"Project Customer" (view + comment) maps to Confluence's Viewer role** (roles model: Viewer can view and comment on content). Grafana: check page-level restrictions on the specific page separately.
+- **App grants vs space access are different layers**: Steph already had Confluence Premium User product access — the gap was purely space membership. Verify product access first (admin.atlassian.com → user → Apps), then space settings.
+- **Fulfill space requests at Space settings → Users → Add people with the narrowest role.** Do NOT add the user to IdP-synced admin groups (e.g. `confluence-users-helcim`) to reach a space — verified that group carries delete-anyone's-content/blogs/comments + manage-access-to-individual-content in this space. Group grant = cross-space over-grant and breaks Okta lifecycle.
+- Marjorie approved via chat, not the portal button; noted in the closure comment. Ticket resolved via transitions 191 (Waiting for support) → 161 (Resolved, resolution Done).
+
 ## Open items
 
 - [ ] **Elavon partner space + guest access** — plan ready in `elavon-partner-space-plan.md` (this folder); awaiting Miranda's go-ahead (partner discussion week of Oct 7, 2026). Then: invite guests → create space → add to space → extend Card Brands board filter → verify → fill guest registry.
