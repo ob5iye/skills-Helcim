@@ -1,6 +1,6 @@
 # Google Workspace Hacks
 
-A running collection of fixes and tips for Gmail, Groups, Calendar, and other Workspace tools.
+A running collection of fixes and tips for Gmail, Groups, Calendar, and other Workspace tools. For GAM7-based Workspace administration and Shared Drive permission cleanup, use the **`google-workspace` skill** in `skills/google-workspace/SKILL.md`.
 
 ---
 
@@ -12,12 +12,14 @@ GAM7 is installed on Abdi's Mac at `~/bin/gam7/gam` with config/cache in `~/.gam
 
 **Authorized as:** `aobsiye-admin@helcim.com` (DwD) / `aobsiye@helcim.com` (client OAuth).
 
+**Credential cleanup:** An OAuth desktop-client secret was exposed in the setup conversation on 2026-10-09. Rotate that client secret in GCP and update/re-authorize GAM locally if this has not already been done. Never paste OAuth secrets, service-account keys, or token files into chat or Git.
+
 **Verify health:** `gam user aobsiye@helcim.com check serviceaccount` — should print "All scopes PASSED!".
 
 **Useful reports:**
 ```bash
-gam print teamdrives            # all shared drives + restrictions
-gam print teamdriveacls         # membership/roles per shared drive
+gam print shareddrives          # all shared drives + restrictions
+gam print shareddriveacls       # membership/roles per shared drive
 gam print users all             # full user directory
 gam print groups all
 gam print group-members group <group@helcim.com>

@@ -14,7 +14,8 @@ Work repo lives at `~/Documents/Devin/skills-Helcim/`. Route first, answer secon
 | Jira projects, boards, workflows, forms, flows, service accounts | `/jira-configuration` skill |
 | Okta Platform SSO, Jamf Pro deploys, zero-touch, Netskope | `/helcim-psso-playbook` skill + `hacks/helcim-zero-touch/` (inject `00-PROJECT-MEMORY.md` first) |
 | Direct mail / HubSpot webhook integration | `/directmail-hubspot-integration` skill |
-| Gmail logs, Workspace admin, Lingo SSO, laptop compliance, Apple test accounts | matching folder under `runbooks/` |
+| Google Workspace admin, GAM7, Drive/Shared Drive access audits and cleanup | `/google-workspace` skill + `runbooks/google-workspace/Google Workspace Hacks.md` |
+| Gmail logs, Lingo SSO, laptop compliance, Apple test accounts | matching folder under `runbooks/` |
 | Chrome extensions (EDD Note Builder, Web Store publisher `fuzz@helcim.com`) | `runbooks/chrome-extensions/README.md` |
 | Intune / Windows compliance, Vanta device checks, Company Portal issues | `runbooks/microsoft-intune/README.md` |
 

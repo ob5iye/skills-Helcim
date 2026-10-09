@@ -19,6 +19,7 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 - `helcim-context` — **router**: routes any Helcim task to the right skill/runbook; writes durable learnings back and pushes
 - `jira-configuration` — Helcim Jira environment: projects, workflows, statuses, forms, automation flows, boards, service accounts
 - `helcim-psso-playbook` — Okta Platform SSO / Desktop Password Sync on macOS via Jamf Pro
+- `google-workspace` — Helcim Workspace admin via GAM7, Shared Drive access audits, nested groups, and safe permission cleanup
 - `directmail-hubspot-integration` — Directmail.io QR-scan webhook → HubSpot via Google Apps Script receiver (no Ops Hub Pro / Zapier)
 - `jsm-ticket-writer` — paste a raw issue, get an ITS (JSM) ticket: plain text (no colons/hyphens/semicolons), minimal wording, assigned to Abdi via MCP
 
