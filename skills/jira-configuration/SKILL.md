@@ -376,7 +376,7 @@ plain condition works.
 - Existing: `Jira-Integrations` — has **4 API token credentials** = likely multiple integrations sharing one identity (known tech debt; audit and split over time).
 - Existing: `Jellyfish` (`jellyfish-ol7jhe9vmy@serviceaccount.atlassian.com`, 2 credentials) — engineering-analytics vendor, seen 2026-09-28; not set up by IT, owner unknown.
 - Added 2026-09-01: **`AI-Document-Reviewer`** (`ai-document-reviewer-ent63hhwe1@serviceaccount.atlassian.com`) for the AI document reviewer bot; API token `ai-doc-reviewer-prod`, expires **2026-09-01 + 1yr (Sep 01 2027)** — calendar rotation ~2 weeks prior. Jira app role = User; project permissions: Browse + Add Comments only. Migration done when token's "Last used" flips from "Never used" → then revoke the old shared credential on Jira-Integrations.
-- Added 2026-09-28: **`Remote-Agents`** (`remote-agents-fd491376bg@serviceaccount.atlassian.com`) for Noah Adams' remote agent toolkit (replaces his personal API token). Jira app role = User only (no Confluence/JSM/other apps). API token `remote-agents-prod`, scopes read:jira-work + write:jira-work, expiry 1 yr (~Sep 28 2027) — rotation reminder ~2 weeks prior. Credentials delivered to Noah via 1Password (email + token; basic auth). Scope: full R/W on all Product and Engineering category spaces via open permission schemes (see audit below); **NAW requires Noah to add the account to the project's Member role** (team-managed, locked down). Scoped-token gotcha flagged to Noah: on 401 against helcim.atlassian.net use gateway `https://api.atlassian.com/ex/jira/5b0727ab-0d7a-42ea-8f77-6d56032fab31/...`.
+- Added 2026-09-28: **`Remote-Agents`** (`remote-agents-fd491376bg@serviceaccount.atlassian.com`) for Noah Adams' remote agent toolkit (replaces his personal API token). Jira app role = User only (no Confluence/JSM/other apps). API token `remote-agents-prod`, scopes read:jira-work + write:jira-work, expiry 1 yr (~Sep 28 2027) — rotation reminder ~2 weeks prior. Credentials delivered to Noah via 1Password (email + token; basic auth). Scope: full R/W on all Product and Engineering category spaces via open permission schemes (see audit below); **added to NAW's Member role 2026-10-13 by Abdi** (ITS-840 — see change history). Remote-Agents accountId: `712020:e74c666c-77a6-4faa-a8b7-1414a5a24596`. Scoped-token gotcha flagged to Noah: on 401 against helcim.atlassian.net use gateway `https://api.atlassian.com/ex/jira/5b0727ab-0d7a-42ea-8f77-6d56032fab31/...`.
 - **Credential creation choices**: API token vs OAuth 2.0 — pick API token when the tool uses basic auth (`email:token`); OAuth 2.0 only if their code implements the flow. Scoped tokens may require the gateway URL `https://api.atlassian.com/ex/jira/{cloudId}/...` instead of the site URL — flag this to integration owners.
 - Scope minimal: read:jira-work + write:jira-work (classic) is the safe granular-equivalent set for read-issues/post-comments bots.
 
@@ -413,6 +413,14 @@ Stephanie Davis (Head of Compliance) requested "Jira Software (Jira)" access to 
 - **Fulfill space requests at Space settings → Users → Add people with the narrowest role.** Do NOT add the user to IdP-synced admin groups (e.g. `confluence-users-helcim`) to reach a space — verified that group carries delete-anyone's-content/blogs/comments + manage-access-to-individual-content in this space. Group grant = cross-space over-grant and breaks Okta lifecycle.
 - Marjorie approved via chat, not the portal button; noted in the closure comment. Ticket resolved via transitions 191 (Waiting for support) → 161 (Resolved, resolution Done).
 
+### 2026-10-13 — Remote-Agents added to NAW Member role (ITS-840, Noah Adams portal request)
+Noah's portal ticket: agents reported EDIT_ISSUES + TRANSITION_ISSUES false "for spaces the remote-agents service account is added to".
+- Diagnosed with `POST /rest/api/3/permissions/check` (bulk, `{accountId, projectPermissions:[{permissions, projects:[ids]}]}`) as the admin — Edit + Transition were already true on all 14 open tech spaces; the bot had **zero** NAW permissions, so NAW was the only offender. Bulk check also showed BROWSE false pre-fix — for service (app) accounts, a team-managed project's "any logged-in user" openness does NOT cover bots; they need an explicit project role.
+- Fix: `POST /rest/api/3/project/NAW/role/11523` body `{"user": ["712020:e74c666c-77a6-4faa-a8b7-1414a5a24596"]}` (NAW role ids: Administrator 11522, **Member 11523**, Viewer 11524). Site admin can do this without being on the project.
+- Re-ran the bulk check: Browse/Create/Edit/Transition/Comment/Assign/Resolve all true on NAW (13188).
+- Commented on ITS-840 (public, told Noah no token change needed), assigned to self, Resolved/Done.
+- Gotcha for ITS service desk: posting a public comment auto-transitions the ticket to "Waiting for customer" — re-list transitions before resolving (Resolved transition id differs per status; needs `fields.resolution`).
+
 ## Open items
 
 - [ ] **Elavon partner space + guest access** — plan ready in `elavon-partner-space-plan.md` (this folder); awaiting Miranda's go-ahead (partner discussion week of Oct 7, 2026). Then: invite guests → create space → add to space → extend Card Brands board filter → verify → fill guest registry.
@@ -420,7 +428,7 @@ Stephanie Davis (Head of Compliance) requested "Jira Software (Jira)" access to 
 - [ ] Audit Jira-Integrations' 4 credentials → identify consumers, plan split.
 - [ ] Token rotation reminder ~Aug 15 2027 (AI-Document-Reviewer).
 - [ ] Token rotation reminder ~Sep 14 2027 (Remote-Agents `remote-agents-prod`).
-- [ ] Remote-Agents: confirm Noah added it to NAW's Member role and his agents cut over off his personal token.
+- [x] Remote-Agents added to NAW Member role 2026-10-13 (ITS-840). Remaining: confirm his agents cut over off his personal token.
 - [ ] Identify owner of the `Jellyfish` service account (2 credentials, not set up by IT).
 - [ ] Delete stale dead-token file `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env` (needs user confirmation).
 - [ ] Revoke/let expire the personal `devin-local-admin` token at id.atlassian.com when admin API work wraps up (`~/.atlassian-api-token`).
