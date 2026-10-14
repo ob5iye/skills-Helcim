@@ -421,6 +421,13 @@ Noah's portal ticket: agents reported EDIT_ISSUES + TRANSITION_ISSUES false "for
 - Commented on ITS-840 (public, told Noah no token change needed), assigned to self, Resolved/Done.
 - Gotcha for ITS service desk: posting a public comment auto-transitions the ticket to "Waiting for customer" — re-list transitions before resolving (Resolved transition id differs per status; needs `fields.resolution`).
 
+### 2026-10-14 — Synced endpoint-plan tracking sheet with ITSP backlog (user-approved per item)
+User pasted the macOS/Windows update + zero-touch tracking sheet and asked which rows needed backlog tickets. Duplicate sweep against ITS/ITSP found most rows already tracked; per-item approval collected before any write.
+- **Created (unassigned, Task):** ITSP-113 Windows driver and firmware update policy (Intune driver update profiles); ITSP-114 Evaluate Rundeck for IT orchestration (research); ITSP-115 Migrate HubSpot to Okta SSO and SCIM (caveat: HubSpot SSO/SCIM are Enterprise-tier gated, ticket tells doer to confirm plan tier first).
+- **Refreshed descriptions on existing backlog items:** ITSP-46 (reboot policy → 30-day uptime mandate, Jamf for macOS, Intune for Windows, sheet status Revise), ITSP-60 (required-app baseline ↔ in-progress base apps inventory), ITSP-45 (app update automation → macOS done in Jamf, Windows remains via Winget/Intune Enterprise App Catalog/Patch My PC). Note: ITSP-45 and ITSP-46 are **Epics**, not Tasks. ITSP-94 (Pendo Okta) got a note to check SCIM availability; it was already assigned to Abdi — existing assignment left intact.
+- **Closed:** ITSP-88 (HubSpot offboarding deprovisioning) → transition id 41 to Done with resolution Done + comment explaining ITSP-115's SSO+SCIM scope subsumes it. ITSP Done transition id = 41 (global), has resolution screen → pass `fields.resolution`.
+- Skipped: all rows marked Done/Up to date (update policies, update rings, hardening baselines, stage-2 research/testing) — already covered by the done wave ITSP-66/68/69/70.
+
 ## Open items
 
 - [ ] **Elavon partner space + guest access** — plan ready in `elavon-partner-space-plan.md` (this folder); awaiting Miranda's go-ahead (partner discussion week of Oct 7, 2026). Then: invite guests → create space → add to space → extend Card Brands board filter → verify → fill guest registry.
