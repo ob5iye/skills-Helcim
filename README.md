@@ -29,7 +29,7 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 **Runbooks**
 - `zero-touch/` — PSSO handoffs, deployment procedure, checklists, Okta Verify plists
 - `okta-apps/` — Lingo SAML SSO integration
-- `google-workspace/` — Google Workspace hacks + Gmail-Logs-to-BigQuery runbook (.docx)
+- `google-workspace/` — Google Workspace hacks, Gmail-Logs-to-BigQuery runbook (.docx), Department-Attribute-Cleanup list (dirty `department` values blocking `dg-*` dynamic groups, 2026-10-16)
 - `laptop-compliance/` — Jira structure plan (5 epics/29 tasks, ITSP)
 - `asset-tracking/` — Laptop asset registry in Jira Assets (serial-keyed + QR stickers); pilot schema live (HLCA), rollout tracked on ITSP-110
 - `apple-id/` — Mobile test account migration, Apple-first plan (.docx)

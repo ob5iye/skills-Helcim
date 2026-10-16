@@ -29,6 +29,8 @@ gam info domain                 # customer ID C02twm3z6, 245 users
 
 **Update GAM:** `gam version battlereport` or rerun the installer script from gam-shortn.appspot.com.
 
+**Groups / dynamic groups:** the tenant already runs 10 dynamic groups (`staff@`, `townhall@`, `dg-<department>@` …). Inventory, constraints and the Product-team pilot facts are in the `google-workspace` skill ("Groups landscape"); the department-attribute cleanup list that must be done before building more `dg-*` groups is `Department-Attribute-Cleanup.md` in this folder.
+
 ---
 
 ## Group emails land in "All Mail" instead of the Inbox
