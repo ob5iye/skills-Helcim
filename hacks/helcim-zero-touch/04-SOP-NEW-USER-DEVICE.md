@@ -7,7 +7,15 @@
 1. **User exists** — production users arrive via **HiBob push** (never Add Person). Test users: create manually.
 2. **Set the handover password:**
    - New user created in Okta: Add Person → **Set password** → **uncheck "User must change password on first login"**
-   - HiBob-provisioned or expired-mode user (the production case): **API set** — the UI has no no-expiry option for existing users; UI "Create a temporary password" = expired mode = the PSSO sheet rejects it:
+   - HiBob-provisioned or expired-mode user (the production case): **API set** — the UI has no no-expiry option for existing users; UI "Create a temporary password" = expired mode = the PSSO sheet rejects it. **Standard tool: `tools/psso-setpass.sh`** (2026-10-16) — token lives in macOS Keychain:
+     ```bash
+     # one-time per admin Mac:
+     psso-setpass.sh --set-token              # paste token at hidden prompt -> Keychain
+     # per user:
+     psso-setpass.sh LOGIN@helcim.com         # generates + sets a compliant password and prints it
+     psso-setpass.sh LOGIN@helcim.com "Hand-over1!"   # or set an explicit one
+     ```
+     Success = `OK: password set ... (passwordChanged=<today>)`. Fallback raw API set:
      ```bash
      read -s OKTA_TOKEN   # paste token once (Security → API → Tokens; store in 1Password)
      curl -X POST "https://helcim.okta.com/api/v1/users/LOGIN@helcim.com" \
@@ -15,7 +23,7 @@
        -H "Content-Type: application/json" \
        -d '{"credentials":{"password":{"value":"<HandoverPassword>"}}}'
      ```
-     Password policy (Helcim): 12+ chars, upper+lower+number, no username substring, not common. Success = JSON user object, status ACTIVE, fresh `passwordChanged` timestamp.
+     Password policy (Helcim): 12+ chars, upper+lower+number, no username substring, not common. Success = JSON user object, status ACTIVE, fresh `passwordChanged` timestamp. Token errors → `E0000011` = deleted/expired OR zone-restricted from an out-of-zone IP (catalog #31).
    - **Reissuing a previously-used account** (wipe/reissue): first **More Actions → Reset Authenticators** → remove YubiKey + old Okta Verify/FastPass enrollments (stale FastPass causes the browser↔OV loop; 2+ factors trigger the progressive 2-factor challenge).
 3. **PSSO-Pilot group** membership ✓ (carries the enrollment policy).
 4. **App assignments** (group-driven): **"Platform Single Sign-On for macOS"** AND **"Netskope Client Enrollment - SAML Forward Proxy"** — assign group `PSSO-Pilot` to both apps once; then per-user = one group add.
