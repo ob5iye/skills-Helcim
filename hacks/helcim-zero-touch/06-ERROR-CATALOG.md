@@ -56,6 +56,7 @@
 | 27 | `read -s VAR` "doesn't work" in new terminal | Variables don't persist across windows | Re-run `read -s` per window |
 | 28 | Okta background image rejected | 2MB upload limit (PNG gradients are ~8MB) | Export JPEG (sips -s format jpeg) → ~150KB |
 | 29 | Button color looks washed-out on sign-in page | Disabled state (empty Username field) — Gen3 widget lightens primary when disabled | Type text → full color; not a theme bug |
+| 31 | **Fresh SSWS token instantly returns 401 `E0000011 "Invalid token provided"`** [2026-10-16] | Token created with origin = network zones, but caller's egress IP is in NO defined zone → Okta reports out-of-zone use as "invalid token" (no zone-specific error). Same code fires for deleted tokens | Edit/Recreate with origin Any IP to test; for a real restriction, caller's egress must live in a named zone (no Office Egress zone existed — only the 2 defaults + Netskope zones). Never paste tokens in chat/screen — use `read -s OKTA_TOKEN` (per window) |
 
 ## Housekeeping incident residue
 

@@ -3,7 +3,7 @@
 ## Security (do first)
 
 1. **Rotate `jamf-ldap@helcim.com` password** — exposed in chat during Aug-21 troubleshooting. Steps: Okta reset → update Jamf LDAP server password field. Then delete/deactivate the dead GSP "LDAP Service Accounts [No MFA]" policy (it grants password-only interactive sessions to that account as long as the password is stale).
-2. **API token hygiene** — the `psso-onboarding` SSWS token (created 2026-09-01) can set ANY user's password. Stored per guidance (1Password); consider IP-zone restriction (recreate token restricted to office zone); revoke when the onboarding helper script gets keychain storage.
+2. **API token hygiene** — 2026-10-16: the original 2026-09-01 `psso-onboarding` token was already gone from the console (silent delete → E0000011). Recreated 2026-10-16; zone-restriction attempt self-rejected the caller (no Office Egress zone exists — see catalog #31) so it's **Any IP for now**. TODO: create "Office Egress" IP zone (Security → Networks) → restrict token to it → re-verify from office. A token string was briefly pasted in chat during the 2026-10-16 session; that token was never successfully used and was deleted immediately. Revoke when the onboarding helper script gets keychain storage.
 3. Netskope enrollment tokens appeared in screenshots/shared output — low sensitivity, treat as internal.
 
 ## Confirmations still open (tests not closed)
