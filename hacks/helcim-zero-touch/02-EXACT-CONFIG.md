@@ -65,13 +65,36 @@ System Extensions allowlist (separate payload/profile): Allowed Team Identifier 
 - User mappings: Object Class `inetOrgPerson` · Username → `uid` (= full email, case-sensitive) · Real Name → `cn` · Email → `mail` (multi-valued risk — `uid` is the safe fallback) · UUID → `uniqueIdentifier` (immutable Okta 00u id, better than uid)
 - Settings → Inventory Collection → "Collect user and location information from LDAP" = ON
 
-## Username stamping (Jamf policy, All Computers, Login + Recurring Check-in, Ongoing)
+## Username stamping + computer naming (one merged Jamf policy, All Computers, Login + Recurring Check-in, Ongoing)
+> 2026-10-16: merged the standalone naming policy into the stamp script (single guard, name set BEFORE recon so one inventory submits both; idempotent; DNS-safe). The old standalone naming policy is DISABLED. Name convention: `Full_Name-SERIAL-Chip_String` (ComputerName incl. underscores; HostName/LocalHostName hyphenated + stripped). Enforcement: misnamed/user-renamed Macs snap back at next check-in.
 ```bash
 #!/bin/bash
+
+# --- Console user guard (shared by naming + stamping) ---
 u=$(scutil <<< "show State:/Users/ConsoleUser" | awk '/Name :/ && ! /loginwindow/ { print $3 }')
 if [[ -z "$u" || "$u" == "root" || "$u" == "_mbsetupuser" ]]; then
   echo "No real user logged in — skipping, retry next check-in"; exit 0
 fi
+
+# --- Computer naming: FullName-Serial-Chip ---
+serial=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
+fullName=$(dscl . -read "/Users/$u" RealName | tail -1 | sed -E 's/^[[:space:]]+//')
+[[ -z "$fullName" ]] && fullName="$u"          # fallback if RealName is blank
+chipType=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || uname -m)
+
+compName="$(echo "$fullName" | sed 's/ /_/g')-${serial}-$(echo "$chipType" | sed 's/ /_/g')"
+netName=$(echo "$compName" | sed 's/_/-/g' | tr -cd 'A-Za-z0-9-')   # DNS-safe strip
+
+if [[ "$(scutil --get ComputerName)" != "$compName" ]]; then
+  /usr/sbin/scutil --set ComputerName  "$compName"
+  /usr/sbin/scutil --set HostName      "$netName"
+  /usr/sbin/scutil --set LocalHostName "$netName"
+  echo "Renamed to $compName"
+else
+  echo "Name already correct: $compName"
+fi
+
+# --- Username stamp + inventory (carries the fresh name in the same recon) ---
 /usr/local/bin/jamf recon -endUsername "${u}@helcim.com"
 ```
 
