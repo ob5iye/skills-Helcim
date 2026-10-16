@@ -29,6 +29,7 @@
 | 16 | Setup Assistant shows plain "create user", no Okta | Wrong PreStage / ABM pointing at Kandji / Okta Verify pkg not a classic enrollment package with a distribution point | ABM → Jamf MDM Server; scope serial to PSSO-Sandbox until "Assigned"; default PreStage auto-assign OFF; classic pkg + Cloud DP |
 | 17 | Device on Kandji after reassignment | Default PreStage auto-assign re-grabs | Turn default PreStage auto-assign OFF |
 | 18 | Jamf scope targets look right but mis-behave ("scoped to group A but also ran elsewhere") | Jamf scope targets are a **UNION**, not intersection | Put intersection INSIDE smart-group criteria (AND member of …), or use Exclusions |
+| 30 | **Wiped Mac activates totally UNMANAGED**: no Remote Management pane, straight to local create-user, perfectly normal setup — and **zero Jamf computer record** afterward, while Jamf PreStage says "Assigned" AND ABM says "Jamf MDM Server" [2026-10-16, C7RQFYWHYG] | ADE **PreStage-assignment push to Apple went stale** — scope assignment dated 07/10 sat for months; Apple had no current enrollment profile for the serial so activation behaved unmanaged. Both UI badges lie in this state | PreStage → Scope: **uncheck serial → Save → re-check → Save** (forces re-push of assignment to Apple) → wipe again. Diagnosis order: (1) ABM MDM Server column, (2) search Jamf for ANY record — zero records + no RM pane = stale push, don't chase profiles |
 
 ## Netskope
 
