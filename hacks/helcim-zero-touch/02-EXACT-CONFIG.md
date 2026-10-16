@@ -66,7 +66,7 @@ System Extensions allowlist (separate payload/profile): Allowed Team Identifier 
 - Settings → Inventory Collection → "Collect user and location information from LDAP" = ON
 
 ## Username stamping + computer naming (one merged Jamf policy, All Computers, Login + Recurring Check-in, Ongoing)
-> 2026-10-16: merged the standalone naming policy into the stamp script (single guard, name set BEFORE recon so one inventory submits both; idempotent; DNS-safe). The old standalone naming policy is DISABLED. Name convention: `Full_Name-SERIAL-Chip_String` (ComputerName incl. underscores; HostName/LocalHostName hyphenated + stripped). Enforcement: misnamed/user-renamed Macs snap back at next check-in.
+> 2026-10-16: merged the standalone naming policy into the stamp script (single guard, name set BEFORE recon so one inventory submits both; idempotent; DNS-safe). The old standalone naming policy is DISABLED. Name convention: `Full_Name-SERIAL-Chip_String` with the `Apple ` prefix stripped from chip (e.g. `Sue_Doe-C7RQFYWHYG-M5_Pro`); ComputerName keeps underscores, HostName/LocalHostName hyphenated + stripped. Enforcement: misnamed/user-renamed Macs snap back at next check-in.
 ```bash
 #!/bin/bash
 
@@ -81,6 +81,7 @@ serial=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 fullName=$(dscl . -read "/Users/$u" RealName | tail -1 | sed -E 's/^[[:space:]]+//')
 [[ -z "$fullName" ]] && fullName="$u"          # fallback if RealName is blank
 chipType=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || uname -m)
+chipType="${chipType#Apple }"   # "Apple M5 Pro" -> "M5 Pro" — Intel strings untouched
 
 compName="$(echo "$fullName" | sed 's/ /_/g')-${serial}-$(echo "$chipType" | sed 's/ /_/g')"
 netName=$(echo "$compName" | sed 's/_/-/g' | tr -cd 'A-Za-z0-9-')   # DNS-safe strip
