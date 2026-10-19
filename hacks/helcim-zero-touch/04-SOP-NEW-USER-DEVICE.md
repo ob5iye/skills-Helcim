@@ -62,5 +62,15 @@
 ## Production rollout widening (when leaving pilot)
 
 - Swap `PSSO-Pilot` group conditions for broader groups / Everyone where policies allow; consider an Okta **group rule** (HiBob-created users → macOS group) so steps 3–4 become automatic.
-- The only remaining manual step at scale = the API password set (candidate for an Okta Workflows flow or a `psso-onboard.sh` helper script).
+- Handover password is one command: `tools/psso-setpass.sh` (delivered 2026-10-16; verifies via live authn, clears PASSWORD_EXPIRED). Remaining manual step at scale = this one call unless an Okta Workflows flow takes it over.
 - Chrome standardization: deploy Chrome (Jamf App Installers) + enable Okta EA "SSO extension support for Chrome on macOS" + set default browser (user confirmation on macOS 26).
+
+### Making PSSO-Sandbox the default PreStage (the production flip — order matters)
+Blast radius: **existing enrolled Macs are NOT affected.** PreStage settings only apply at activation/Setup Assistant. Impact = future new devices AND any production Mac that gets wiped later (its *user* must then pass the Okta gate: app assigned, clean factors, non-expired password).
+1. **Widen the PSSO app assignment FIRST** — "Platform Single Sign-On for macOS" (`0oa1w2y9e0jWfdw701d8`) → onboarding group rule (HiBob users → macOS group) or Everyone. With pilot-only assignment, the first non-pilot hire hits error #1 at first boot.
+2. Widen the Netskope enrollment app assignment in the same pass (rollout item).
+3. Security sign-off: **New User Account Type = Administrator** must hold as a fleet default, not just pilot.
+4. Old default ("Jamf Pro Enrollment") → auto-assign **OFF** — keep the PreStage as rollback/exception lane (loaners, presentation machines).
+5. PSSO-Sandbox → set as default PreStage for computers.
+6. Proof run: one clean wipe (record spawns at enrollment, naming+stamp at first login, apps land — zero terminal). Only then announce; the Confluence walkthrough (ISP page 312737890) is the doc to link.
+7. Exceptions after flip: release the serial from PSSO-Sandbox scope → device falls to... nothing (old default has auto-assign OFF) → manually assign the serial to the old PreStage for that device's next enrollment.
