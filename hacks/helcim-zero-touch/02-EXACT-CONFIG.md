@@ -78,7 +78,8 @@ fi
 
 # --- Computer naming: FullName-Serial-Chip ---
 serial=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
-fullName=$(dscl . -read "/Users/$u" RealName | tail -1 | sed -E 's/^[[:space:]]+//')
+fullName=$(dscl . -read "/Users/$u" RealName 2>/dev/null | tail -1 | sed -E 's/^RealName:[[:space:]]*//; s/^[[:space:]]+//')
+case "$fullName" in "No such key"*) fullName="";; esac   # missing RealName key
 [[ -z "$fullName" ]] && fullName="$u"          # fallback if RealName is blank
 chipType=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || uname -m)
 chipType="${chipType#Apple }"   # "Apple M5 Pro" -> "M5 Pro" — Intel strings untouched
