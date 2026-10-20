@@ -39,7 +39,7 @@ System Extensions allowlist (separate payload/profile): Allowed Team Identifier 
 **Scope: static computer group `SSO-Sandboxing`** (wipe/re-enroll = re-add new record!)
 
 ## Jamf — SCEP (PSSO-Device Access)
-- CA type Manual · URL = Okta Device Access dynamic SCEP URL · Name "Okta Device Access CA"
+- CA type Manual · URL = `https://helcim.okta.com/pki/CD4EB6420AB5D4A86B04C3DAC378F3D4276E3819/scep/rac37834dmgUFKlD81d8` (pattern `/pki/<CA-id>/scep/<RA-id>`, same ids as the challenge URL) · Name "Okta Device Access CA" · Retries 3 / Retry Delay 10s (was 0/0; raised 2026-10-20 after `MDM-SCEP:15002` at enrollment) · Fingerprint blank, no uploaded cert
 - Redistribute profile 30 days (Okta CA can't auto-renew)
 - Subject `CN=$COMPUTERNAME ODA $UDID` (Jamf appends `$PROFILE_IDENTIFIER`)
 - Challenge Type **Dynamic-Microsoft CA**; Challenge URL `https://helcim.okta.com/api/v1/certificateAuthorities/CD4EB6420AB5D4A86B04C3DAC378F3D4276E3819/registrationAuthorities/rac37834dmgUFKlD81d8/challenge` · username `okta-SMFSWE`
