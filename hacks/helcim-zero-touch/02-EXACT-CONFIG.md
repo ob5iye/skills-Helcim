@@ -17,7 +17,16 @@
 - AASA verified: `https://helcim.okta.com/.well-known/apple-app-site-association` lists `B7F62B65BN.com.okta.mobile` under `authsrv`
 - Protocol: `PlatformSSO.ProtocolVersion = 2.0`
 
-## Jamf — PSSO-Extension profile (consolidated, Computer Level, Install Automatically)
+## Jamf — the THREE-profile layering (final, proven 2026-10-20 on H6V + KR29)
+| Profile | Payloads | Installs when | Why separate |
+|---|---|---|---|
+| **PSSO-Extension** (bound to Simplified Setup) | SSOe + Associated Domains + 2 Custom Settings — **nothing else** | BEFORE enrollment (Identity-first) | Apple's validator rejects SysExt here (#34); dynamic SCEP can't run without a device identity (#35) |
+| **PSSO-Device Access** | SCEP only | Enrollment phase (PreStage-attached) + group scope | Dynamic challenge needs a registered device → must come after identity exists |
+| **Okta System Extensions** | SysExt allowlist `B7F62B65BN` | Enrollment phase + group scope | Validator forbids it inside the SSOe-bound profile |
+
+All three: scope `SSO-Sandboxing`, all three attached to the PreStage. The "consolidated single profile" era (Sep–Oct) worked only while the PreStage wasn't Identity-first; it is dead.
+
+## Jamf — PSSO-Extension profile (Computer Level, Install Automatically) — SSOe + Associated Domains + Custom Settings ONLY
 Single Sign-On Extensions payload:
 - Use Platform SSO = Include ON, Auth Method = **Password**
 - Use Shared Device Keys = Enable + **Include toggle ON** (button alone isn't enough)
@@ -46,9 +55,9 @@ System Extensions allowlist (separate payload/profile): Allowed Team Identifier 
 - Key 2048 · Use as digital signature ✓ · Allow export ✗ · nothing to upload
 
 ## Jamf — PreStage "PSSO-Sandbox"
-- General: ADE = Jamf MDM Server · auto-assign OFF · MDM mandatory ON · Allow removal OFF · Require Auth OFF · min macOS 26
+- General: ADE = Jamf MDM Server · auto-assign OFF · MDM mandatory ON · Allow removal OFF · Require Auth OFF · min macOS = **15.8.1** (set 2026-10-20: the dropdown offered no bare "26"; lowest Tahoe option 26.5.2 would exclude 26.5.1 test Macs. Raise to a 26.x once the fleet floor passes it — pending item)
 - Setup Assistant: **Enable Simplified Setup for Platform SSO ✓** · workflow method **Identity first (SSOe profile installs before enrollment)** [newer Jamf UI label; was "Attended"] · SSOe profile = PSSO-Extension · Enrollment Customization Config = **None** (Jamf warns it's incompatible with Identity First — expected) · **Touch ID pane NOT skipped** (the forced-fingerprint step)
-- Configuration Profiles attached: **PSSO-Extension (consolidated — includes its own SCEP, Associated Domains, System Extensions + 2 custom-settings payloads) + Okta System Extensions (standalone)** = 2 profiles. **Do NOT attach a separate SCEP profile** — SCEP already lives inside the consolidated one (verified 2026-10-20: Friday's working device had PSSO-Extension + Okta System Extensions, no standalone SCEP)
+- Configuration Profiles attached: **PSSO-Extension + PSSO-Device Access (SCEP) + Okta System Extensions = 3 profiles** (see the three-profile layering table above; superseded the same-day "2 profiles, SCEP inside" note after #35)
 - Enrollment Packages: **OktaVerify-9.65.2.pkg classic package, Distribution Point = Cloud Distribution Point (Jamf Cloud)** — App Installer version lands too late for Setup Assistant
 
 ## ABM routing (before any wipe/ship)

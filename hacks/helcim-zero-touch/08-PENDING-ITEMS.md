@@ -26,7 +26,10 @@
 13. GSP "LDAP Service Accounts [No MFA]" — delete (see #1)
 14. "Testing & Migration (MFA Bypass)"→ check Rules tab for stray LDAP-group rule copy; delete the RULE only (policy serves Rundeck + Argo CD)
 15. Stale duplicate Jamf computer records (post-wipe duplicates — e.g. double "Sue's MacBook Pro") — delete old
-16. **"PSSO-Device Access" zombie profile** (2026-10-20 audit: No scope defined, Completed 0 — never delivered; it's the pre-consolidation standalone SCEP, orphaned when SCEP moved inside PSSO-Extension) — open once to confirm contents, then delete. NOT to be attached to anything (validators: consolidated profile already carries SCEP)
+16. ~~"PSSO-Device Access" zombie profile — delete~~ **REVERSED same day:** it is now the LIVE SCEP profile (scoped SSO-Sandboxing + PreStage-attached) after #35 proved dynamic SCEP can't live in the pre-enrollment SSOe profile. Keep. The SCEP challenge password's only copy is the 1Password note "OKTA - SCEP configuration" (Helcim vault) — Okta never re-displays it.
+17. **Raise PreStage min macOS from 15.8.1 to a 26.x** once every test/loaner Mac is ≥ that build (currently 26.5.1 on H6V/KR29 blocks picking 26.5.2).
+18. **Office Egress IP zone** → restrict `psso-onboarding` token to it (candidate IP `162.217.233.210`, verify with `curl ifconfig.me` from office first).
+19. **Three enrolled Macs (JR2, MQ6K, PMQG) → confirm they take the re-split profiles cleanly**: PSSO-Extension (now SCEP-less) Completed, PSSO-Device Access Completed, user pane still Registered ●, `app-sso platform -s` still returns config. JR2 note: its Okta device record is bound to Sandra Mastrovito, not Mike — resolve ownership before handover.
 16. Remove accidentally-created duplicate password-only rule if any lingering on Okta Account Management Policy (July note: one was deactivated — verify it's gone/inactive)
 
 ## Parked decisions
