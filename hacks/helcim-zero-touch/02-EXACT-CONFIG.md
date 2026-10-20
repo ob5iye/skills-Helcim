@@ -6,7 +6,7 @@
 | App | "Platform Single Sign-On for macOS" (OIN catalog; requires Device Access license) |
 | Client ID | `0oa1w2y9e0jWfdw701d8` |
 | App sign-in policy | App-specific policy "Platform Single Sign-On for macOS" (bound 1:1), catch-all = Allowed with password, re-auth every 12h |
-| Assignment | Group `PSSO-Pilot` (pilot) → widen at production |
+| Assignment | Group `PSSO-Pilot` (assigned 2026-10-20 via API — build-time truth had been individual assigns of sdoe+agibson only; the "group-driven" assumption was false for 3 months) → widen at production. Same-day: group also assigned to **Netskope Client Enrollment - SAML Forward Proxy** (`0oa234kg25yTGkxyN1d8`) |
 | Profile Editor attributes | `macOSAccountFullName`, `macOSAccountUsername` mapped from Okta profile |
 
 ## SSO extension / URLs
