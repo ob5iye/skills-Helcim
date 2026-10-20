@@ -47,7 +47,7 @@ System Extensions allowlist (separate payload/profile): Allowed Team Identifier 
 
 ## Jamf — PreStage "PSSO-Sandbox"
 - General: ADE = Jamf MDM Server · auto-assign OFF · MDM mandatory ON · Allow removal OFF · Require Auth OFF · min macOS 26
-- Setup Assistant: **Enable Simplified Setup for Platform SSO ✓** · workflow Attended · SSOe profile = PSSO-Extension · **Touch ID pane NOT skipped** (the forced-fingerprint step)
+- Setup Assistant: **Enable Simplified Setup for Platform SSO ✓** · workflow method **Identity first (SSOe profile installs before enrollment)** [newer Jamf UI label; was "Attended"] · SSOe profile = PSSO-Extension · Enrollment Customization Config = **None** (Jamf warns it's incompatible with Identity First — expected) · **Touch ID pane NOT skipped** (the forced-fingerprint step)
 - Configuration Profiles attached: SCEP + PSSO-Extension + System Extensions
 - Enrollment Packages: **OktaVerify-9.65.2.pkg classic package, Distribution Point = Cloud Distribution Point (Jamf Cloud)** — App Installer version lands too late for Setup Assistant
 
