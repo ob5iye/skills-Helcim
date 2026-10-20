@@ -26,6 +26,7 @@
 13. GSP "LDAP Service Accounts [No MFA]" — delete (see #1)
 14. "Testing & Migration (MFA Bypass)"→ check Rules tab for stray LDAP-group rule copy; delete the RULE only (policy serves Rundeck + Argo CD)
 15. Stale duplicate Jamf computer records (post-wipe duplicates — e.g. double "Sue's MacBook Pro") — delete old
+16. **"PSSO-Device Access" zombie profile** (2026-10-20 audit: No scope defined, Completed 0 — never delivered; it's the pre-consolidation standalone SCEP, orphaned when SCEP moved inside PSSO-Extension) — open once to confirm contents, then delete. NOT to be attached to anything (validators: consolidated profile already carries SCEP)
 16. Remove accidentally-created duplicate password-only rule if any lingering on Okta Account Management Policy (July note: one was deactivated — verify it's gone/inactive)
 
 ## Parked decisions
