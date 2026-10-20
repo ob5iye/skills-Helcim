@@ -390,7 +390,7 @@ plain condition works.
   - `DSR: Permission Scheme` (id 11285) — PENG: same, everything ANY LOGGED-IN USER.
   - `NAW: Simplified Permission Scheme` (id 12350) — NAW (Noah's Agentic Workspace, team-managed): Browse + Comment open to any logged-in user, but **Create/Edit/Transition/Assign/Resolve require project role Administrator or Member** — bots need to be added to the project's Member role.
 - Practical consequence: a service account with just the Jira User role already has full R/W on every tech-team space except NAW.
-- **Personal admin API token for Devin API work**: classic token (NOT scoped) from id.atlassian.com → Security → API tokens, saved at `~/.atlassian-api-token` (chmod 600); basic auth `aobsiye@helcim.com:<token>` against `https://helcim.atlassian.net`. Never paste tokens into chat. The old Slite-migration token (in `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env`) is revoked/dead — file can be deleted.
+- **Personal admin API token for Devin API work**: classic token (NOT scoped) from id.atlassian.com → Security → API tokens, saved at `~/.atlassian-api-token` (chmod 600); basic auth `aobsiye@helcim.com:<token>` against `https://helcim.atlassian.net`. Never paste tokens into chat. The old Slite-migration token (in `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env`) was believed revoked/dead but was confirmed **live** on 2026-10-20 — rotate it, then delete the file (see change history + open items).
 
 ## Change history (continued)
 
@@ -428,8 +428,13 @@ User pasted the macOS/Windows update + zero-touch tracking sheet and asked which
 - **Closed:** ITSP-88 (HubSpot offboarding deprovisioning) → transition id 41 to Done with resolution Done + comment explaining ITSP-115's SSO+SCIM scope subsumes it. ITSP Done transition id = 41 (global), has resolution screen → pass `fields.resolution`.
 - Skipped: all rows marked Done/Up to date (update policies, update rings, hardening baselines, stage-2 research/testing) — already covered by the done wave ITSP-66/68/69/70.
 
+### 2026-10-20 — Blank-looking JSM tickets: answers live in SaasJet Smart Issue Forms (ITS-848)
+Third occurrence of "General IT Help" / portal tickets with empty description + no request fields via API (after ITS-831, ITS-841). Root cause confirmed: issue carries `saasjet.forms.*` properties — the General IT Help form is the **Smart Issue Forms for Jira** app (SaasJet), so answers are stored by the app, NOT mapped to description/request fields. `rest/servicedeskapi/request/{id}` shows only `priority` in requestFieldValues; REST issue/properties shows no answers. Only the UI (or attached screenshots) reveals the content. Operational rule: **when a ticket key looks blank via MCP/API, ask the user to paste the form answers from the Jira UI** — don't try /rest/forms endpoints (404, and they only cover native forms anyway). ITS-848 also carried an attachment (`Screenshot ... .png`) retrievable via `GET /rest/api/3/attachment/content/{id}` with basic auth, which contained the requester's screenshot of her problem.
+Also verified today: the Slite-migration token in `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env` is **LIVE, not revoked** — earlier note claiming it was dead is wrong. File still needs deletion + token rotation.
+
 ## Open items
 
+- [ ] **URGENT — Slite-migration token is live**: rotate/revoke at id.atlassian.com → Security → API tokens, then delete `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env` (confirmed working 2026-10-20 despite earlier "dead" note — see change history).
 - [ ] **Elavon partner space + guest access** — plan ready in `elavon-partner-space-plan.md` (this folder); awaiting Miranda's go-ahead (partner discussion week of Oct 7, 2026). Then: invite guests → create space → add to space → extend Card Brands board filter → verify → fill guest registry.
 - [ ] AI-Document-Reviewer: confirm team cutover (Last used flips), then revoke its old token from Jira-Integrations.
 - [ ] Audit Jira-Integrations' 4 credentials → identify consumers, plan split.
@@ -437,5 +442,5 @@ User pasted the macOS/Windows update + zero-touch tracking sheet and asked which
 - [ ] Token rotation reminder ~Sep 14 2027 (Remote-Agents `remote-agents-prod`).
 - [x] Remote-Agents added to NAW Member role 2026-10-13 (ITS-840). Remaining: confirm his agents cut over off his personal token.
 - [ ] Identify owner of the `Jellyfish` service account (2 credentials, not set up by IT).
-- [ ] Delete stale dead-token file `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env` (needs user confirmation).
+- [x] ~~Delete stale dead-token file~~ superseded: token is LIVE (see 2026-10-20 entry + URGENT open item above).
 - [ ] Revoke/let expire the personal `devin-local-admin` token at id.atlassian.com when admin API work wraps up (`~/.atlassian-api-token`).
