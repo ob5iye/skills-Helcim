@@ -80,7 +80,12 @@ System Extensions allowlist (separate payload/profile): Allowed Team Identifier 
 - User mappings: Object Class `inetOrgPerson` · Username → `uid` (= full email, case-sensitive) · Real Name → `cn` · Email → `mail` (multi-valued risk — `uid` is the safe fallback) · UUID → `uniqueIdentifier` (immutable Okta 00u id, better than uid)
 - Settings → Inventory Collection → "Collect user and location information from LDAP" = ON
 
-## Username stamping + computer naming (one merged Jamf policy, All Computers, Login + Recurring Check-in, Ongoing)
+## Jamf — Re-enrollment settings (Settings → Global → Re-enrollment) — REQUIRED for re-issued laptops
+- **Clear policy logs on re-enrollment ✓** — Jamf reuses the computer record across a wipe (stable UDID); without this, "Once per computer" policies (stamp/naming, id 52) never run again on a re-enrolled Mac (#39).
+- **Clear User and Location information on re-enrollment ✓** — previous owner's stamp must not survive into the new user's record.
+- Legacy "Helcim Computer Naming Convention" policy (id 16) → **disabled**; naming lives in policy 52.
+
+## Username stamping + computer naming (one merged Jamf policy id 52 "Stamp Username + LDAP Lookup", All Computers, Login + Recurring Check-in)
 > 2026-10-16: merged the standalone naming policy into the stamp script (single guard, name set BEFORE recon so one inventory submits both; idempotent; DNS-safe). The old standalone naming policy is DISABLED. Name convention: `Full_Name-SERIAL-Chip_String` with the `Apple ` prefix stripped from chip (e.g. `Sue_Doe-C7RQFYWHYG-M5_Pro`); ComputerName keeps underscores, HostName/LocalHostName hyphenated + stripped. Enforcement: misnamed/user-renamed Macs snap back at next check-in.
 ```bash
 #!/bin/bash
