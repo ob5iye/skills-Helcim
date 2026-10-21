@@ -17,14 +17,18 @@
 - AASA verified: `https://helcim.okta.com/.well-known/apple-app-site-association` lists `B7F62B65BN.com.okta.mobile` under `authsrv`
 - Protocol: `PlatformSSO.ProtocolVersion = 2.0`
 
-## Jamf — the THREE-profile layering (final, proven 2026-10-20 on H6V + KR29)
-| Profile | Payloads | Installs when | Why separate |
+## Jamf — the THREE-profile layering (FINAL — proven end-to-end 2026-10-21, Marcelo Ramos / L9MF750DC9, zero manual steps)
+| Profile | ID | Payloads | Notes |
 |---|---|---|---|
-| **PSSO-Extension** (bound to Simplified Setup) | SSOe + Associated Domains + 2 Custom Settings — **nothing else** | BEFORE enrollment (Identity-first) | Apple's validator rejects SysExt here (#34); dynamic SCEP can't run without a device identity (#35) |
-| **PSSO-Device Access** | SCEP only | Enrollment phase (PreStage-attached) + group scope | Dynamic challenge needs a registered device → must come after identity exists |
-| **Okta System Extensions** | SysExt allowlist `B7F62B65BN` | Enrollment phase + group scope | Validator forbids it inside the SSOe-bound profile |
+| **PSSO-Extension** | 45 | SSOe + Associated Domains + 2 Custom Settings — **nothing else** | Apple's Simplified Setup validator rejects a SysExt payload here (#34). No `$USERNAME` key. |
+| **PSSO-Device Access** | 44 | SCEP only | **Allow all apps access = ON, Allow export = OFF** — without all-apps access Okta Verify can't use the key → System-keychain admin prompt (#37) |
+| **Okta System Extensions** | 46 | SysExt allowlist `B7F62B65BN` | Validator forbids it inside the SSOe-bound profile |
 
-All three: scope `SSO-Sandboxing`, all three attached to the PreStage. The "consolidated single profile" era (Sep–Oct) worked only while the PreStage wasn't Identity-first; it is dead.
+**Scope of all three = smart group `PSSO-Sandbox Enrolled` (id 58; criteria: Enrollment Method: PreStage enrollment **is** PSSO-Sandbox) + static `SSO-Sandboxing` (54, legacy).** The smart group is what makes zero-touch real: a freshly enrolled record is in scope from its first inventory, so Jamf never issues the "Remove Configuration Profile" commands it otherwise fires at enrollment for out-of-scope PreStage profiles (#38). No post-enrollment group add anymore.
+
+All three attached to the PreStage, which runs **Device first**. In device-first all three install during enrollment, before the PSSO pane — the SCEP cert exists at registration (Friday's and Marcelo's Okta sequence: `pki.cert.issue` → `pki.cert.bind` → `platform_sso.keys.register` → `password_sync.authentication`).
+
+Proven-good Okta log signature (Marcelo, 2026-10-21): 15:23:34 cert.issue → 15:25:10 enrollment.create + cert.bind + lifecycle.activate → 15:25:11 keys.register → 15:25:52 password_sync.authentication SUCCESS → 15:27:09 mfa.factor.activate (FastPass) + password_sync.enrollment.create. **3m35s, no prompts.**
 
 ## Jamf — PSSO-Extension profile (Computer Level, Install Automatically) — SSOe + Associated Domains + Custom Settings ONLY
 Single Sign-On Extensions payload:
@@ -45,19 +49,21 @@ Application & Custom Settings (two domains; **NO `OktaVerify.UserPrincipalName`/
 
 System Extensions allowlist (separate payload/profile): Allowed Team Identifier `B7F62B65BN`.
 
-**Scope: static computer group `SSO-Sandboxing`** (wipe/re-enroll = re-add new record!)
+**Scope: smart group `PSSO-Sandbox Enrolled` (58) + static `SSO-Sandboxing` (54)** — see layering table; the old "re-add new record after every wipe" rule is retired.
 
-## Jamf — SCEP (PSSO-Device Access)
+## Jamf — SCEP (PSSO-Device Access, profile 44)
 - CA type Manual · URL = `https://helcim.okta.com/pki/CD4EB6420AB5D4A86B04C3DAC378F3D4276E3819/scep/rac37834dmgUFKlD81d8` (pattern `/pki/<CA-id>/scep/<RA-id>`, same ids as the challenge URL) · Name "Okta Device Access CA" · Retries 3 / Retry Delay 10s (was 0/0; raised 2026-10-20 after `MDM-SCEP:15002` at enrollment) · Fingerprint blank, no uploaded cert
 - Redistribute profile 30 days (Okta CA can't auto-renew)
 - Subject `CN=$COMPUTERNAME ODA $UDID` (Jamf appends `$PROFILE_IDENTIFIER`)
 - Challenge Type **Dynamic-Microsoft CA**; Challenge URL `https://helcim.okta.com/api/v1/certificateAuthorities/CD4EB6420AB5D4A86B04C3DAC378F3D4276E3819/registrationAuthorities/rac37834dmgUFKlD81d8/challenge` · username `okta-SMFSWE`
-- Key 2048 · Use as digital signature ✓ · Allow export ✗ · nothing to upload
+- Key 2048 · Use as digital signature ✓ · **Allow export from keychain ✗ · Allow all apps access ✓** (API: `KeyIsExtractable=false`, `AllowAllAppsAccess=true`) · nothing to upload
+- Cert CN is filled from the Jamf record's name at profile-composition time (e.g. a re-enrolled Mac's cert may read `Setup_User-…` until the naming policy renames it) — cosmetic.
 
-## Jamf — PreStage "PSSO-Sandbox"
+## Jamf — PreStage "PSSO-Sandbox" (id 2)
 - General: ADE = Jamf MDM Server · auto-assign OFF · MDM mandatory ON · Allow removal OFF · Require Auth OFF · min macOS = **15.8.1** (set 2026-10-20: the dropdown offered no bare "26"; lowest Tahoe option 26.5.2 would exclude 26.5.1 test Macs. Raise to a 26.x once the fleet floor passes it — pending item)
-- Setup Assistant: **Enable Simplified Setup for Platform SSO ✓** · workflow method **Identity first (SSOe profile installs before enrollment)** [newer Jamf UI label; was "Attended"] · SSOe profile = PSSO-Extension · Enrollment Customization Config = **None** (Jamf warns it's incompatible with Identity First — expected) · **Touch ID pane NOT skipped** (the forced-fingerprint step)
-- Configuration Profiles attached: **PSSO-Extension + PSSO-Device Access (SCEP) + Okta System Extensions = 3 profiles** (see the three-profile layering table above; superseded the same-day "2 profiles, SCEP inside" note after #35)
+- Setup Assistant: **Enable Simplified Setup for Platform SSO ✓** · workflow = **DEVICE FIRST** (Platform SSO app bundle ID **`com.okta.mobile`**; API: `platformSsoAppBundleId=com.okta.mobile`, `pssoConfigProfileId=-1`) · Enrollment Customization Config = None · **Touch ID pane NOT skipped** (the forced-fingerprint step)
+  - **NEVER "Identity first."** Jamf's two workflows differ fundamentally: identity-first installs the SSOe profile *before* enrollment via a 403 handshake and requires Jamf Pro SAML SSO; with Okta it produced "Registration failed" on every device (#36) and `MDM-SCEP:15002` for any SCEP delivered that way. Device-first = Jamf holds the Mac in Setup Assistant until the PSSO app + attached profiles are installed, then registration, then account creation. (The July doc's "Attended" was device-first; 2026-10-20 it was mislabeled identity-first and cost a day.)
+- Configuration Profiles attached: **PSSO-Extension (45) + PSSO-Device Access (44) + Okta System Extensions (46)** — API `prestageInstalledProfileIds: ['44','45','46']`, `installProfilesDuringSetup: true`
 - Enrollment Packages: **OktaVerify-9.65.2.pkg classic package, Distribution Point = Cloud Distribution Point (Jamf Cloud)** — App Installer version lands too late for Setup Assistant
 
 ## ABM routing (before any wipe/ship)

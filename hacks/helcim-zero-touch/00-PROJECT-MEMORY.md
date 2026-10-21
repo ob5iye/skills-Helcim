@@ -1,5 +1,7 @@
 # Helcim Zero-Touch macOS Project — Master Memory File
-**Last updated: 2026-09-01 · Author of record: Abdi Obsiye (IT) · Stack: ABM → Jamf Pro → Okta (OIE, Device Access) → Netskope**
+**Last updated: 2026-10-21 · Author of record: Abdi Obsiye (IT) · Stack: ABM → Jamf Pro → Okta (OIE, Device Access) → Netskope**
+
+> **2026-10-21 — ZERO-TOUCH PROVEN CLEAN.** Marcelo Ramos / L9MF750DC9: wipe → Remote Management → Okta pane → Touch ID → desktop as `mramos` (admin), FastPass enrolled, all 3 PSSO profiles persisted, **no manual step, no prompt, 3m35s in Okta's log.** The Oct 16–20 saga (catalog #30–#38) ended with three structural fixes: PreStage **Device first** (not Identity first), SCEP profile with **Allow all apps access**, and PSSO profiles scoped to the **smart group `PSSO-Sandbox Enrolled`** (enrollment-method criteria) so Jamf stops removing them at enrollment.
 
 > **For AI models:** Start here. This file is the index + executive summary. Each numbered file is self-contained — inject this file plus whichever topic file matches the task. Everything is verified against a live org (`helcim.okta.com`), not generic documentation. When this pack conflicts with vendor docs, this pack wins for THIS org.
 
@@ -43,6 +45,7 @@ Head of security's requirement that drove the final design: *"someone given a la
 
 1. **Passwords for enrollment must be admin-set with must-change OFF.** Any "temporary password"/expired-mode password is rejected by the native PSSO sheet. New-Okta-user: set at creation. Existing/expired user: API `PUT /api/v1/users/{login}` with `credentials.password` (UI cannot do this). Users come from HiBob → the API set is THE standard onboarding step.
 2. **Group, not person.** Every app assignment and policy scope should be group-based (`PSSO-Pilot` group carries: PSSO app assignment + enrollment policy + Netskope enrollment app assignment). Individual assignments caused two incidents (Ana; Netskope enrollment app).
-3. **A wipe = a new Jamf record.** Static group membership does NOT survive. After every wipe/re-enroll: re-add to static groups, delete the stale record.
+3. **PreStage-attached profiles must ALSO be in their own scope at enrollment, or Jamf removes them** (scope engine fires "Remove Configuration Profile" the instant the device enrolls — #38). Never scope PSSO profiles to a static group; use the smart group keyed on *Enrollment Method: PreStage enrollment = PSSO-Sandbox*. (Old form of this rule: "a wipe = a new record, re-add to the static group" — retired 2026-10-21.)
+3b. **Device first, never Identity first.** Jamf's two Simplified Setup workflows are not labels for the same thing (#36). Identity-first = SSOe before enrollment = no SCEP cert at registration = "Registration failed" with zero Okta events. When re-enabling Simplified Setup after a drift, check the radio.
 4. **System Log first.** For ANY Okta-side failure: Reports → System Log → user email → `outcome.reason` names the exact fault. Never debug the device first.
 5. **Order the dependency chains.** Netskope-before-identity was the recurring failure. New architecture (IdP mode) removes the chain; where ordering matters (profiles, stamping), gate with smart groups + Update Inventory.

@@ -32,9 +32,10 @@
 
 ## B. Jamf device side
 
-7. **ABM** → serial → Assign Device Management → **Jamf MDM Server** → Jamf Device Enrollments → Refresh → **PSSO-Sandbox PreStage** scope shows **Assigned**.
-8. Device in **SSO-Sandboxing** static group.
-9. **After ANY wipe/re-enroll:** the Mac returns as a NEW computer record → re-add to SSO-Sandboxing + **delete the stale old record**. Missed = Okta sign-in works at Setup Assistant but no registration afterward (profile gone when scope syncs).
+7. **ABM** → serial → Assign Device Management → **Jamf MDM Server** → Jamf Device Enrollments → Refresh → **PSSO-Sandbox PreStage** scope shows **Assigned**. Assign close to the wipe; an assignment that sat for weeks may need the uncheck→Save→recheck→Save re-push (#30).
+8. ~~Device in SSO-Sandboxing static group~~ **Not needed since 2026-10-21** — the three PSSO profiles are scoped to the smart group `PSSO-Sandbox Enrolled` (Enrollment Method: PreStage enrollment = PSSO-Sandbox); any device enrolling through the PreStage is in scope automatically (#38).
+9. **After a wipe:** nothing to re-add. Stale duplicate records (if Jamf created one) → delete the old one. Verify the fresh enrollment in the record: `lastEnrolledDate` moved, all three PSSO profiles listed, no "Remove Configuration Profile" commands in its history.
+10. **PreStage must be Device first** (`com.okta.mobile`), never Identity first (#36). If anyone re-enables Simplified Setup after a drift, re-check the workflow radio.
 
 ## C. The user's experience (what to tell them / demo)
 
@@ -46,6 +47,7 @@
 
 ## D. Verification (5 min)
 
+- [ ] **Okta System Log, in order (the proof signature):** `pki.cert.issue` → `device.enrollment.create` + `pki.cert.bind` → `device.platform_sso.keys.register` → `device.password_sync.authentication SUCCESS` → `user.mfa.factor.activate` (Okta Verify) + `device.password_sync.enrollment.create`. Marcelo 2026-10-21: whole chain in 3m35s. Missing `cert.bind`/`keys.register` = no cert at registration (#36/#37); zero events = extension failed locally
 - [ ] Okta → user profile → **Okta Verify (FastPass)** factor dated today
 - [ ] Mac System Settings → Users & Groups → user → **Registered ● / SSO tokens present ● / "password synced"**
 - [ ] `app-sso platform -s` returns a config
