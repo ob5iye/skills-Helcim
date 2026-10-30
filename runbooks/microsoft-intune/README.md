@@ -69,6 +69,14 @@ couple of Production devices before calling it done.
 - **Do not bulk-remove standalone Intune Plan 1**: only some holders are in the E3 group. Keep existing Intune Plan 1 and Plan 2 assignments until each affected user's coverage and the original assignment source have been checked. In particular, do not remove licensing from critical users merely to clear an E3 conflict when the pilot demonstrates Intune Plan 1 can coexist.
 - No Azure subscription was available for Cloud Shell; Microsoft Graph PowerShell ran locally on macOS with delegated device-code sign-in. The tenant's E3 SKU part number is `Microsoft_365_E3_(no_Teams)` (not `SPE_E3`); use the SKU ID returned by Graph rather than assuming a generic E3 part number. Authentication failures and failed Graph commands are **not** evidence that a licensing operation completed.
 
+### License state 2026-10-30 — POOL EXHAUSTED
+
+- `lic-m365-e3` group grown to **43 direct members** (was 31 at cutover).
+- Subscription blade shows **45/45 assigned — zero licenses free**. The 45/45 total is **group + direct assignments combined**, NOT the group alone; direct E3 assignments exist for at least Corey Jackson, Kimberly Vejvoda, Mike Delamont. A "43 members vs 45/45" discrepancy is expected math, not a sync failure (43 + 3 direct − overlap, or 42 licensed + 1 error + 3 direct).
+- The subscription page has a pending **Errors & Issues (1)** entry — check it first; a failed member would show there, not via any "sync".
+- Group licensing is near-real-time; no force-sync exists. To reprocess a group after fixing an error: group → Licenses → **Reprocess** button, or re-POST the same `assignLicense` via Graph.
+- **Action needed**: next `lic-m365-e3` member gets `InsufficientLicenses`. Buy more E3 seats (current subscription "Sep 29, 2026, 45 purchased") or audit/reclaim. Also consider removing direct E3 assignments once those users are in the group (duplicates don't double-consume but confuse the count).
+
 ## Hard-won rules
 
 - **ONE owner per CSP area.** Never let a Device restrictions template profile
