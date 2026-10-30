@@ -73,9 +73,10 @@ couple of Production devices before calling it done.
 
 - `lic-m365-e3` group grown to **43 direct members** (was 31 at cutover).
 - Subscription blade shows **45/45 assigned — zero licenses free**. The 45/45 total is **group + direct assignments combined**, NOT the group alone; direct E3 assignments exist for at least Corey Jackson, Kimberly Vejvoda, Mike Delamont. A "43 members vs 45/45" discrepancy is expected math, not a sync failure (43 + 3 direct − overlap, or 42 licensed + 1 error + 3 direct).
-- The subscription page has a pending **Errors & Issues (1)** entry — check it first; a failed member would show there, not via any "sync".
-- Group licensing is near-real-time; no force-sync exists. To reprocess a group after fixing an error: group → Licenses → **Reprocess** button, or re-POST the same `assignLicense` via Graph.
-- **Action needed**: next `lic-m365-e3` member gets `InsufficientLicenses`. Buy more E3 seats (current subscription "Sep 29, 2026, 45 purchased") or audit/reclaim. Also consider removing direct E3 assignments once those users are in the group (duplicates don't double-consume but confuse the count).
+- Errors & Issues (1) = **Tania Lyons (`tlyons@helcim.com`) — InsufficientLicenses, unlicensed 5–30 days**. Exact math confirmed: 42 group-licensed (43 members − Tania) + 3 direct (Corey Jackson, Kimberly Vejvoda, Mike Delamont) = 45/45, no duplicate counting. Portal **Reprocess keeps failing** because 0 seats are free; it cannot self-heal until a license is purchased or reclaimed.
+- Tania holds **standalone Intune Plan 1** (from the kept Plan-1 cohort), so her **device management/Intune still works** — she only lacks the E3 workloads (Office apps, Exchange mailbox, OneDrive/SharePoint).
+- Group licensing is near-real-time; no force-sync exists. After a seat frees: Errors & Issues page → **Reprocess** (or it re-evaluates on its own), or re-POST the same `assignLicense` via Graph.
+- **Action needed**: buy ≥1 more E3 seat (current subscription "Sep 29, 2026, 45 purchased") or reclaim one from a departed/unneeded holder, then reprocess Tania. Every new `lic-m365-e3` member will land in Errors & Issues until then.
 
 ## Hard-won rules
 
