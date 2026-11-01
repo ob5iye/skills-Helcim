@@ -15,6 +15,7 @@ Living record of Helcim's Jira setup and every admin change we make. Append new 
   - Gotcha: `searchJiraIssuesUsingJql` requires `fields` as an **array**, not a comma-separated string.
   - Granted scopes: `read:jira-work`, `write:jira-work`, plus Confluence read/write for pages and comments.
   - **No MCP tools** for deleting issues, creating custom fields, editing board filters, or editing forms/flows/workflows — those are UI-only actions the user must perform (or a future admin API token).
+  - **Form answers are also unreadable via MCP** (verified 2026-11-01 on ITS-865): JSM/native form submissions render nothing in `description`, Rovo `search` returns the issue with empty text, custom fields only show the non-form-backed ones, and the classic token in `.env` gets "Issue does not exist or you do not have permission". Get the text from the reporter/user paste or the portal UI.
 - Org has **Atlassian Guard** (real Service accounts feature exists under admin.atlassian.net → Directory → Service accounts).
 - In the current UI, projects are presented as **"Spaces"** and automation rules are called **"Flows"**.
 
@@ -139,6 +140,14 @@ Built via guided UI session (Abdi executing, Devin verifying by MCP). Final stat
 - Credentials learning: the classic API token in skills-Helcim `.env` (`ATLASSIAN_API_TOKEN`, aobsiye identity) authenticates but has near-zero rights: 0 projects visible, ADMINISTER_PROJECTS/ADMINISTER all false. Use it only for anonymous-ish reads; do admin work in UI with Abdi's account or stand up a service account.
 
 ## Change history
+
+### 2026-11-01 — COMP Data Deletion Form (form 919) missing pretext (ITS-865)
+Request via JSM portal (ITS-865, reporter Reggie Lavender-Mead, Compliance, approver Stephanie Davis, category "Product improvement"): restore the intro/guidance text that vanished from the COMP "Data Deletion Form" (form 919, builder `/jira/software/c/projects/COMP/form/919/builder`), structured like LEGAL form 952's header. Facts established while working it:
+- **COMP — Compliance** (id 12084), company-managed software. Form 919 creates issue type **Data Deletion (11720)**; submitted tickets get labels `form`, `form-919`.
+- **Data Deletion Request Type field = customfield_12401**, options seen in use: Business Data Deletion Request (12594), Data Subject Request (DSR, 12595), User Deletion Request (12596). Other form-backed fields: Applicable Email Address = 12070, Merchant Hub/Defender Link = 12962, Request Date of Deletion = 12403.
+- Automation on Business Data tickets spawns subtasks: "Send initial form email", "Application Data", Marketing Data purges (Customer.io, HubSpot, Survey Monkey, Bigquery), all assigned to Reggie Lavender-Mead.
+- Handling: MCP can't read form answers (see Environment note); Reggie pasted the ask. Drafted replacement pretext from Compliance's own sources (PRI-002 DSR Procedure — 10 business day ack / 30 calendar day response, privacy@helcim.com routing; types from customfield_12401 usage) and posted it as public comment **80418** on ITS-865 for Reggie to confirm or replace; Stephanie Davis cc'd re still-pending approval (ticket sat in Waiting for approval since Oct 27, SLA paused). Form edit itself is UI-only; paste final text into builder once Reggie confirms.
+- People: Reggie Lavender-Mead `712020:b6395dd2-b1bd-4fe5-9eb7-f09a44865003` (rlavendermead@helcim.com)
 
 ### 2026-09-25 — Goals: already live instance-wide; "enable Goals for Marketing" needed no change (ITS-806)
 Request via JSM portal (ITS-806, reporter Jason Hale, approver Jeff Newfeld): "Marketing would like to explore using Goals... enable it for the Marketing Space."
