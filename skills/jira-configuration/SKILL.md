@@ -119,6 +119,12 @@ Projects), ATL (Atlas), COB (Cobalt), ABA (Abacus), AUR (Aurora), Triage, Legal,
 Cybersecurity (Confluence space key `CYBERPROJ`), MKT (**Marketing**, id 12217, classic
 company-managed software — distinct from MOP **Marketing Ops**, id 12218).
 
+### 2026-11-01 — ELAV "Elavon Collaboration" spec received (ITS-847); build pending in UI
+- Request from Miranda Russell: shared Helcim/Elavon Kanban workspace. Spec doc (Drive file 18RskCde1NO_uHNk_evj0rUzSlJ-IElV80_umMkZWou8): key `ELAV`; statuses New → Not Started → In Progress → Waiting on Elavon → Waiting on Helcim → On Hold → Done; board columns NEW | WAITING ON HELCM(=Not Started+In Progress+Waiting on Helcim) | WAITING ON ELAVON | ON HOLD | DONE; issue types Task + new Question/Request types; custom fields Owner Organization (select Helcim/Elavon, required), Related Program/Topic (short text); commenter-org flows (elavon.com comment → Waiting on Helcim, helcim.com comment → Waiting on Elavon), assignee email on assignment/column entry, reporter email on Done, monthly first-business-day review Task (expert cron, slips to Monday if day 1 is a weekend).
+- External isolation: Elavon users Christi McAmis + Jordan Potter must see ELAV only. Plan: invite via Admin hub into a product-access group granted nothing elsewhere (check default-group membership is off), dedicated ELAV permission scheme granting roles only. Jira Cloud cannot hide the user directory from licensed users; flagged to requester as limitation.
+- People (accountIds): Nico Plouffe `712020:24add32d-9f7a-4f21-9702-194c6ddb153b` (nplouffe@helcim.com, the "Nico" in the spec, NOT Nicolas Beique), Chris Fenwick `712020:6bec4b49-1637-481a-8c92-83f34e6c204f` (cfenwick@helcim.com), Stephanie Davis `712020:0a3fbdb9-fcc5-43b3-bb6e-86820087e0f5` (sdavis@helcim.com). Key `ELAV` free, no name collision across all 66 projects.
+- Credentials learning: the classic API token in skills-Helcim `.env` (`ATLASSIAN_API_TOKEN`, aobsiye identity) authenticates but has near-zero rights: 0 projects visible, ADMINISTER_PROJECTS/ADMINISTER all false. Use it only for anonymous-ish reads; do admin work in UI with Abdi's account or stand up a service account.
+
 ## Change history
 
 ### 2026-09-25 — Goals: already live instance-wide; "enable Goals for Marketing" needed no change (ITS-806)
