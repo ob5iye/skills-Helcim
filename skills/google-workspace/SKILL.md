@@ -99,6 +99,13 @@ Do not assume ITS-838 was commented on or resolved: the work in this session cha
 - The `department` attribute is hand-edited in Google (users created manually by `nstewart-admin@`; Okta pushes only the `gcp_*` groups, not profile attributes). Before building any `dg-*` group, run the department-vs-list diff and fix the attribute first — the cleanup list, evidence and proposed GAM commands live in `runbooks/google-workspace/Department-Attribute-Cleanup.md`.
 - Product pilot facts: `productteam@` (static DL, 15 members) is not on any drive; the Product Shared Drive (`0AITCgl2PYCdxUk9PVA`) is fed by five nested `ac-product-*` security groups that all resolve to the same ~10 people, plus 13 direct user grants (6 Managers, one of them suspended). `bmattas@` and `mkissinger@` (department = Product) have no drive access at all. `design-product-software@` is dynamic but unlabelled and unused on drives.
 
+## External-sharing "Public" Shared Drives — documented 2026-11-03 (ITS-877)
+
+- Tenant convention for sharing files with external parties (partners, vendors): Shared Drives with `domainUsersOnly: False`. Four exist: **Public Share Drive** (`0ANK6wEXkjJhlUk9PVA`, general; organizers incl. cbrown, tlyons, cfinnson, aobsiye), **Partnerships-Public** (`0AEqZPKeZfoy-Uk9PVA`), **Design - Public Drive** (`0AJgBBDJM-ck9Uk9PVA`), **Executive Public Share** (`0ANrirVbmSe4-Uk9PVA`). Pick the functional owner (Partnerships-Public for partner material), or Public Share Drive as the general default.
+- Requesters often say "Google Public Drive" and answer the JSM form's Role question with their job title; default them to **Content manager** (`fileOrganizer`) so they can upload and share externally. Ask for the external recipient email and whether named-share vs anyone-with-link is acceptable before advising a share method.
+- Add a member (as an existing organizer): `gam user aobsiye@helcim.com create drivefileacl <driveId> user <user@helcim.com> role fileorganizer`. Verify with `gam user <user> info teamdrive <driveId>` (resolves = access OK; "Shared drive not found" = no access).
+- ITS-877 (2026-11-03): mkissinger@helcim.com (Product) added as fileOrganizer to Public Share Drive to share the Bill Pay onboarding walkthrough with J.P. Morgan. He still has no access to the Product Shared Drive (`0AITCgl2PYCdxUk9PVA`) — separate known gap from the department-attribute audit; do not bundle without approval.
+
 ## Chrome Browser Cloud Management (CBCM) — verified 2026-10-20
 
 - Helcim Chrome policies are pushed from **CBCM** (Google Admin → Devices → Chrome → Settings), NOT from Jamf plists — macOS managed devices have no `/Library/Managed Preferences/com.google.Chrome.plist`.
