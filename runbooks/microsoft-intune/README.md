@@ -78,6 +78,35 @@ couple of Production devices before calling it done.
 - Group licensing is near-real-time; no force-sync exists. After a seat frees: Errors & Issues page → **Reprocess** (or it re-evaluates on its own), or re-POST the same `assignLicense` via Graph.
 - **Action needed**: buy ≥1 more E3 seat (current subscription "Sep 29, 2026, 45 purchased") or reclaim one from a departed/unneeded holder, then reprocess Tania. Every new `lic-m365-e3` member will land in Errors & Issues until then.
 
+## BitLocker recovery key lookup by Key ID (2026-11-04)
+
+Keys escrow to the **Entra device object**, not Intune — a laptop can be
+missing from Intune's Windows devices list and still have its key in the
+tenant. Lookup path:
+
+1. Fastest GUI: entra.microsoft.com → **Devices → Recovery keys** → paste the
+   Key ID (GUID from the laptop's BitLocker screen).
+2. Graph (works on macOS, plain python3 + device-code flow, no pwsh needed):
+   ```
+   GET https://graph.microsoft.com/v1.0/informationProtection/bitlocker/recoveryKeys/{keyId}?$select=key
+   ```
+   with delegated scope `BitLockerKey.Read.All`.
+
+Gotchas learned live:
+
+- **`$select` must list `key` ALONE** — `?$select=key,id,createdDateTime`
+  silently returns metadata with no key. Took four attempts to isolate.
+- Require a device-like `User-Agent` header (e.g. `Dsreg/10.0 (Windows
+  10.0.19043.1466)`) per docs; we sent one throughout, so the $select quirk
+  was the real blocker.
+- A **deleted Entra device leaves an orphaned key record** that still reads
+  fine via the above GET — the device page and registeredOwners 404, but the
+  key value is retrievable. Device name then has to come from elsewhere
+  (serial, user report).
+- Case file: Lenovo laptop (key `118E2ED5-…`, escrowed 2025-01-15) absent
+  from Intune + Entra; key recovered via Graph. Follow-up: after unlock,
+  re-enroll/re-escrow so the key maps to a live device.
+
 ## Hard-won rules
 
 - **ONE owner per CSP area.** Never let a Device restrictions template profile
