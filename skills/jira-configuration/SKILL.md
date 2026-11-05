@@ -117,11 +117,16 @@ Company-managed **software** space, key `FINP` (sensitive HR/payroll tickets). B
 
 ### ELAV — Elavon Collaboration
 External Helcim/Elavon collaboration space, company-managed Kanban. Full build definition in change history entry dated 2026-11-01. Key detail: Elavon users are **guests** (Guest - Collaborator role), never licensed users.
+- Screens (3 screen schemes, one screen each for Create/Edit/View): `ELAV: Kanban Default Issue Screen` (Question, Request, Story, Task, Sub-task), `ELAV: Kanban Bug Screen` (Bug), `ELAV: Kanban Epic Screen` (Epic). Owner Organization + Related Program / Topic added to all three on 2026-11-05.
 
 **Other spaces/projects in the instance:** ITS (IT Services, service desk), ITSP (IT Services
 Projects), ATL (Atlas), COB (Cobalt), ABA (Abacus), AUR (Aurora), Triage, Legal,
 Cybersecurity (Confluence space key `CYBERPROJ`), MKT (**Marketing**, id 12217, classic
 company-managed software — distinct from MOP **Marketing Ops**, id 12218).
+
+### 2026-11-05 — ELAV: "Owner Organization is required" blocked all creates (FIXED)
+Miranda could not create Tasks/Questions in ELAV: red banner "Owner Organization is required" with no field to fill. Root cause: on 2026-11-01 we set Required on `customfield_13601` in `ELAV: Field Scheme` but never added the field to any ELAV **screen**, so the create dialog could not render it. Confirmed via `getJiraIssueTypeMetaWithFields` (ELAV Task/Question: 15 fields, no 13601/13602). Fix (UI, Abdi): Project settings → Work items → Screens → expand each of the 3 screen schemes → click screen → bottom "Select Field..." → add Owner Organization + Related Program / Topic. Verified after: Task, Question, Request, Bug, Epic all return 13601 `required: true` (Helcim 14249 / Elavon 14250), 17 fields.
+**Lesson:** "Required on" in a field scheme does NOT put the field on a screen. After marking any field required, run `getJiraIssueTypeMetaWithFields` for each affected type and confirm the field is present. Also test a create from the UI before handing a space over.
 
 ### 2026-11-01 — ELAV "Elavon Collaboration" BUILT (ITS-847)
 Built via guided UI session (Abdi executing, Devin verifying by MCP). Final state:
@@ -463,7 +468,7 @@ Also verified today: the Slite-migration token in `/Users/aobsiye/Documents/Devi
 ## Open items
 
 - [ ] **URGENT — Slite-migration token is live**: rotate/revoke at id.atlassian.com → Security → API tokens, then delete `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env` (confirmed working 2026-10-20 despite earlier "dead" note — see change history).
-- [ ] **Elavon partner space + guest access** — plan ready in `elavon-partner-space-plan.md` (this folder); awaiting Miranda's go-ahead (partner discussion week of Oct 7, 2026). Then: invite guests → create space → add to space → extend Card Brands board filter → verify → fill guest registry.
+- [x] **Elavon partner space + guest access** — built 2026-11-01 as ELAV (see change history). Remaining: confirm Christi McAmis + Jordan Potter accepted guest invites, fill guest registry in `elavon-partner-space-plan.md`, delete test card ELAV-2.
 - [ ] AI-Document-Reviewer: confirm team cutover (Last used flips), then revoke its old token from Jira-Integrations.
 - [ ] Audit Jira-Integrations' 4 credentials → identify consumers, plan split.
 - [ ] Token rotation reminder ~Aug 15 2027 (AI-Document-Reviewer).
