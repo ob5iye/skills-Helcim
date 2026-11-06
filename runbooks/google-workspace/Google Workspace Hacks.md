@@ -150,4 +150,22 @@ gam user <admin> delete chatmember asadmin spaces/<id> user <member>   # spaces 
 
 **Platform limitation (verified 2026-11-06):** Chat API **cannot delete human memberships in 1:1 DIRECT_MESSAGE spaces** — error: "Can't delete human user memberships in direct messages between human users or with an app." This applies both as admin (`asadmin`) and as the member. Membership removal only works on named/group spaces. For cleanup of an unwanted 1:1 DM, the user must Hide conversation and/or Block the other account in the Chat UI. (Observed case: Valentyna Ryzha's DM `spaces/54yuXqAAAAE` with service account `design@helcim.com`/Frosty Design — could not be removed via API.)
 
-**Cutting an account off Chat (verified 2026-11-06):** Chat service status is Admin-console only (Apps → Google Workspace → Google Chat → Service status), settable per OU — GAM cannot toggle it. Pattern used for `design@helcim.com`: created OU `/Helcim Service Accounts/Chat Disabled` ("Chat Disabled" = service accounts with Chat turned off; do NOT move humans there), moved the account with `gam create org` + `gam update user <user> ou ...`, then set Google Chat Service status = OFF for that OU in the console. Effect: account can't sign in to Chat, disappears from the Chat picker, and new messages to it are refused; existing DM history stays visible to the other party. The parent OU `/Helcim Service Accounts` has 46 accounts incl. functional shared inboxes (help@, success@, finance@) — do NOT turn Chat off OU-wide without confirming nobody signs into those mailboxes directly.
+---
+
+## Calendar meeting-room delegation via GAM (2026-11-06)
+
+Helcim has 15 Calendar resources (`gam print resources`): conference rooms Pepper/Glacier/Lemonade/Midnight/Grape, phone booths Cherry/Kiwi/Peach/Lime/Blueberry/Tangerine, meeting spaces (Common Couch, Dev Meeting Table, Blurple), plus the "Recruitment Event Calendar".
+
+**Grant a coordinator (e.g. recruiter/EA managing interviews+onboardings) the power to edit/move room bookings:** add a calendar ACL on the resource calendars. Roles: `reader|writer|editor|owner` — `editor` and `writer` both map to "Make changes to events" (API emits Role: writer); `owner` = "Make changes and manage sharing" (grants sharing power too — only give if they must hand access to others).
+
+```bash
+gam resources "<resourceId1>,<resourceId2>,..." create|add acls editor user:<someone@helcim.com> sendnotifications false
+gam resources "<ids>" print acls            # verify
+gam resources "<ids>" delete acls user:<someone@helcim.com>   # revoke
+```
+
+Note: `gam resources all ...` is NOT valid — pass the comma-separated resourceId list. Use `sendnotifications false` or the grantee gets one email per room.
+
+Granted 2026-11-06: **csanderson@helcim.com = editor ("Make changes to events") on all 15 resource calendars** (request: be able to shuffle rooms for interviews/onboardings). How she uses it: add the room calendars via Calendar → Other calendars → Browse resources; with editor rights she can open any booked room event, remove/swap the room, or create bookings directly on a room calendar.
+
+**Cutting an account off Chat (verified 2026-11-06)** Chat service status is Admin-console only (Apps → Google Workspace → Google Chat → Service status), settable per OU — GAM cannot toggle it. Pattern used for `design@helcim.com`: created OU `/Helcim Service Accounts/Chat Disabled` ("Chat Disabled" = service accounts with Chat turned off; do NOT move humans there), moved the account with `gam create org` + `gam update user <user> ou ...`, then set Google Chat Service status = OFF for that OU in the console. Effect: account can't sign in to Chat, disappears from the Chat picker, and new messages to it are refused; existing DM history stays visible to the other party. The parent OU `/Helcim Service Accounts` has 46 accounts incl. functional shared inboxes (help@, success@, finance@) — do NOT turn Chat off OU-wide without confirming nobody signs into those mailboxes directly.
