@@ -132,3 +132,20 @@ Key reminders:
 - Dashboard: https://chrome.google.com/webstore/devconsole (sign in as `fuzz@helcim.com`, publisher `fuzz`) — this is NOT Google Play.
 - Uploads need `manifest.json` at the **zip root** (Drive folder downloads nest it — repackage) and a version **higher** than the published one.
 - Last update: 2026-09-29, Autogenerating EDD Note Builder 0.0.0.1 → 0.0.2.
+
+---
+
+## Google Chat via GAM7 (set up 2026-11-06)
+
+A Chat app named **GAM** (App ID / project number `604434694659`) is now configured on the `it-services-474319` GCP project — required before ANY Chat write/admin API call works. Config: not a Workspace add-on, all interactive features off (no 1:1, no join spaces, no commands), Cloud Pub/Sub topic `projects/it-services-474319/topics/no-topic` (inert, GAM doesn't listen), visibility limited (unchecked domain-wide), Markdown syntax, error logging on. Read-only Chat calls worked without this; writes (`delete chatmember`, `print chatspaces`, `info chatspace` bot-context) fail with "Google Chat app not found" until the app exists.
+
+**Working commands:**
+```bash
+gam user <user> show chatsearchmessages keywords "<text>"     # find messages/space
+gam user <user> info chatspace spaces/<id>                    # space details
+gam user <user> info chatspacedm <otherUser@helcim.com>       # resolve a DM space
+gam user <user> show chatmembers spaces/<id>                  # members
+gam user <admin> delete chatmember asadmin spaces/<id> user <member>   # spaces only
+```
+
+**Platform limitation (verified 2026-11-06):** Chat API **cannot delete human memberships in 1:1 DIRECT_MESSAGE spaces** — error: "Can't delete human user memberships in direct messages between human users or with an app." This applies both as admin (`asadmin`) and as the member. Membership removal only works on named/group spaces. For cleanup of an unwanted 1:1 DM, the user must Hide conversation and/or Block the other account in the Chat UI. (Observed case: Valentyna Ryzha's DM `spaces/54yuXqAAAAE` with service account `design@helcim.com`/Frosty Design — could not be removed via API.)
