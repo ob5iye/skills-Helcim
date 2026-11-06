@@ -44,3 +44,13 @@ tells you which item the source belongs to.
 ## Change history
 - **2026-09-29:** Autogenerating EDD Note Builder updated 0.0.0.1 → 0.0.2
   (source edited Sept 24–25, 2026; repackaged from Drive export, submitted for review).
+- **2026-11-06:** Known-bad extension found: **Yodeck Web Player Extension**
+  (v0.0.0.13). It hijacks new windows/popups for signage control
+  and breaks Google's own app switching — clicking Calendar/Sheets in Gmail's
+  app menu or side panel opens a small popup rectangle that loads with **403
+  "you do not have access to this page"**; apps work fine in new tabs and in a
+  Guest profile. Diagnose any "Google apps open as a broken embedded window"
+  complaint by testing in a Guest profile; if Guest is fine, bisect extensions.
+  Yodeck does not belong on regular workstations — signage devices only; the
+  dashboard works without the extension. (Resolved on aobsiye@helcim.com by
+  disabling it.)
