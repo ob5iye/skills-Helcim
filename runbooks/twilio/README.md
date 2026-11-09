@@ -37,10 +37,19 @@ sorted by extension. `workers.csv` is git-ignored because it is a staff roster.
 Underlying call:
 `GET https://taskrouter.twilio.com/v1/Workspaces/{WS}/Workers?PageSize=1000` with Basic auth.
 
+## Extension tracker sheet
+
+Google Sheet **"Twillio extensions"** (tab `extensions`):
+https://docs.google.com/spreadsheets/d/150TZ_oQgUc1OdTbTtuDEHxJWDoZ6CuajMX_BJVOhCkQ/edit
+Full index 1135–1413, unassigned numbers labeled `Available`. Update via GAM7:
+`gam user aobsiye@helcim.com update sheetrange <id> json file rows.json charset utf-8 raw`
+(2026-11-09: wrote the full index, 44 assigned / 235 available)
+
 ## State as of 2026-11-09
 
-- 157 workers, 46 with an `ext`, range 1135 to 1403 (next free 1404).
-- Duplicate extensions: **1317** (jsandhu, ltaylor) and **1399** (bnguyen, ldeleon).
+- 157 workers, 44 with an `ext`, range 1135 to 1403 (next free 1404).
+- Duplicates 1317 (jsandhu, ltaylor) and 1399 (bnguyen, ldeleon) resolved by
+  removing `ext` from ltaylor and bnguyen; both numbers free again.
 - ~12 people have two worker records, one bare username and one email
   (cbeauchamp, rng, sdavis, tmanchee, mcharath, smacisaac, rmccaughey, jgunby,
   avanee, tlitwin, wmcfarland, aobsiye). Likely leftovers from an older login format.
