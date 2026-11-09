@@ -22,6 +22,7 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 - `google-workspace` — Helcim Workspace admin via GAM7, Shared Drive access audits, nested groups, and safe permission cleanup
 - `directmail-hubspot-integration` — Directmail.io QR-scan webhook → HubSpot via Google Apps Script receiver (no Ops Hub Pro / Zapier)
 - `jsm-ticket-writer` — paste a raw issue, get an ITS (JSM) ticket: plain text (no colons/hyphens/semicolons), minimal wording, assigned to Abdi via MCP
+- `twilio-extension-assign` — assign/remove a Twilio Flex phone extension for a named user and sync the extensions Google Sheet
 
 **Hacks**
 - `helcim-zero-touch` — 9-file Okta PSSO + Jamf + Netskope master archive (inject `00-PROJECT-MEMORY.md` first) + Swift tools

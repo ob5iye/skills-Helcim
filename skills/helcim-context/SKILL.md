@@ -19,6 +19,7 @@ Work repo lives at `~/Documents/Devin/skills-Helcim/`. Route first, answer secon
 | Chrome extensions (EDD Note Builder, Web Store publisher `fuzz@helcim.com`) | `runbooks/chrome-extensions/README.md` |
 | Intune / Windows compliance, Vanta device checks, Company Portal issues | `runbooks/microsoft-intune/README.md` |
 | Twilio Flex / TaskRouter workers, phone extensions | `runbooks/twilio/README.md` + `list_workers.py` |
+| Assign/remove a Twilio phone extension for a user, update extension sheet | `/twilio-extension-assign` skill |
 
 `skills-Helcim/README.md` has the full inventory if none of the above fit.
 
