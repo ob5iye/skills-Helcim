@@ -18,6 +18,7 @@ Work repo lives at `~/Documents/Devin/skills-Helcim/`. Route first, answer secon
 | Gmail logs, Lingo SSO, laptop compliance, Apple test accounts | matching folder under `runbooks/` |
 | Chrome extensions (EDD Note Builder, Web Store publisher `fuzz@helcim.com`) | `runbooks/chrome-extensions/README.md` |
 | Intune / Windows compliance, Vanta device checks, Company Portal issues | `runbooks/microsoft-intune/README.md` |
+| Twilio Flex / TaskRouter workers, phone extensions | `runbooks/twilio/README.md` + `list_workers.py` |
 
 `skills-Helcim/README.md` has the full inventory if none of the above fit.
 
