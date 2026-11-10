@@ -15,7 +15,8 @@ Living record of Helcim's Jira setup and every admin change we make. Append new 
   - Gotcha: `searchJiraIssuesUsingJql` requires `fields` as an **array**, not a comma-separated string.
   - Granted scopes: `read:jira-work`, `write:jira-work`, plus Confluence read/write for pages and comments.
   - **No MCP tools** for deleting issues, creating custom fields, editing board filters, or editing forms/flows/workflows — those are UI-only actions the user must perform (or a future admin API token).
-  - **Form answers are also unreadable via MCP** (verified 2026-11-01 on ITS-865): JSM/native form submissions render nothing in `description`, Rovo `search` returns the issue with empty text, custom fields only show the non-form-backed ones, and the classic token in `.env` gets "Issue does not exist or you do not have permission". Get the text from the reporter/user paste or the portal UI.
+  - **Sprint field is also unreadable via MCP** (verified 2026-11-10 on BD-186): the MCP allowlist drops it from `fields` on `searchJiraIssuesUsingJql`/`getJiraIssue`. Use JQL helpers instead — `sprint in openSprints()` / `sprint in closedSprints()` / `sprint in futureSprints()` work fine in the JQL itself.
+  - **Sprint create/close/start has no MCP path**: write scope is `write:jira-work` only (no `write:sprint:jira-software`), and there is no Agile API token on file since 2026-11-09 (`.env` now Twilio-only; old `ATLASSIAN_API_TOKEN` was removed and had near-zero rights anyway). Sprint management = Jira UI (site admin) or a new classic/basic-auth token against `helcim.atlassian.net/rest/agile/1.0/...`. (verified 2026-11-01 on ITS-865): JSM/native form submissions render nothing in `description`, Rovo `search` returns the issue with empty text, custom fields only show the non-form-backed ones, and the classic token in `.env` gets "Issue does not exist or you do not have permission". Get the text from the reporter/user paste or the portal UI.
 - Org has **Atlassian Guard** (real Service accounts feature exists under admin.atlassian.net → Directory → Service accounts).
 - In the current UI, projects are presented as **"Spaces"** and automation rules are called **"Flows"**.
 
@@ -122,7 +123,10 @@ External Helcim/Elavon collaboration space, company-managed Kanban. Full build d
 **Other spaces/projects in the instance:** ITS (IT Services, service desk), ITSP (IT Services
 Projects), ATL (Atlas), COB (Cobalt), ABA (Abacus), AUR (Aurora), Triage, Legal,
 Cybersecurity (Confluence space key `CYBERPROJ`), MKT (**Marketing**, id 12217, classic
-company-managed software — distinct from MOP **Marketing Ops**, id 12218).
+company-managed software — distinct from MOP **Marketing Ops**, id 12218), BD
+(**Brand Design**, id 12219, classic company-managed software; scrum board with numbered
+sprints — sprint names/devices seen in summaries, e.g. "Meta Ads - Sprint 21"; admin changes
+today blocked for the team by a board-permissions hack Jason set up, removal pending 2026-11-10).
 
 ### 2026-11-05 — ELAV: "Owner Organization is required" blocked all creates (FIXED)
 Miranda could not create Tasks/Questions in ELAV: red banner "Owner Organization is required" with no field to fill. Root cause: on 2026-11-01 we set Required on `customfield_13601` in `ELAV: Field Scheme` but never added the field to any ELAV **screen**, so the create dialog could not render it. Confirmed via `getJiraIssueTypeMetaWithFields` (ELAV Task/Question: 15 fields, no 13601/13602). Fix (UI, Abdi): Project settings → Work items → Screens → expand each of the 3 screen schemes → click screen → bottom "Select Field..." → add Owner Organization + Related Program / Topic. Verified after: Task, Question, Request, Bug, Epic all return 13601 `required: true` (Helcim 14249 / Elavon 14250), 17 fields.
