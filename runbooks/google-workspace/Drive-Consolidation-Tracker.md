@@ -48,7 +48,7 @@ Baselines scanned 2026-11-12 (pre-pilot). Drive IDs pulled from `gam print share
 PCI evidence drives, Board/Legal-sensitive (Helcim Board Data, Series C Diligence), external-share drives (External User Drive, Helcim <> Neubreed, Switch & Google Team), call-recording archives, backups (Asana/Slite/Q10/G-Suite/Quickbooks), test drives (Cordell's test, Test RClone, Test Shared Drive), one-merchant drives.
 
 ## Procedure per drive (proven on MX - Success)
-1. Backup current ACL: `gam print shareddriveacls` row + member list of every group on it into `~/GAM-backups/<thing>-<date>.csv`.
+1. Backup current ACL: `gam print shareddriveacls` row + member list of every group on it into runbooks/google-workspace/backups/<thing>-<date>.csv`.
 2. Add anchor group: `gam user aobsiye-admin@helcim.com add drivefileacl <driveId> group <group> role fileorganizer asadmin`.
 3. Add/promote lead direct: `... add drivefileacl <driveId> user <lead> role organizer asadmin`.
 4. Remove old group + duplicate user entries: `... delete drivefileacl <driveId> <email> asadmin`.
