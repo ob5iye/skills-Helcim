@@ -36,6 +36,7 @@ separate private repo **skills-sahan**. Keep employer material in this repo only
 - `apple-id/` — Mobile test account migration, Apple-first plan (.docx)
 - `chrome-extensions/` — Chrome Web Store publisher (`fuzz@helcim.com`), EDD Note Builder extensions + update procedure
 - `microsoft-intune/` — Windows fleet in Intune: compliance-policy map, DeviceLock CSP single-owner rule, DeviceLock conflict case file (2026-10-07)
+- `executive-mac-onboarding/` — Windows→Mac switcher runbook (CEO, 2026-11-12): IT pre-stage checklist, recommended app stack, handover session, plus `CRASH-COURSE.md` to hand to the user
 - `twilio/` — Twilio Flex / TaskRouter: `list_workers.py` dumps every worker + phone extension via the API (creds in `.env`), duplicate-ext findings (2026-11-09)
 
 ## Wiring skills into Devin (symlinks)
