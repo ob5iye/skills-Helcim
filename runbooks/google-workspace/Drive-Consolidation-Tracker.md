@@ -12,37 +12,37 @@ Baselines scanned 2026-11-12 (pre-pilot). Drive IDs pulled from `gam print share
 
 ## Department drives
 
-| # | Shared drive | Anchor group (Content manager) | Lead Manager (direct) | Current gate groups | Status |
+| # | Shared drive / Story | Anchor group (Content manager) | Lead Manager (direct) | Current gate groups | Status |
 |---|---|---|---|---|---|
 | 1 | MX - Success | `mx-success-team@` | `mgonzaga@` | was `ac-mx-success-*`, removed | ✅ |
-| 2 | Sales | `mx-sales-team@` | pmclellan (confirm) | `ac-mx-sales-{reporter,developer,maintainer}`, `ac-mx-owner` (organizer) | 🔍 |
-| 3 | MX - Support | `mx-support-team@` | askosareva (confirm) | `mx-dept@`(fileOrganizer), `finance-dept@`(fileOrganizer) — odd, review | 🔍 |
-| 4 | Product | `productteam@` (exclude `productbot`) | tbd (confirm with leads) | `ac-product-{owner,maintainer,developer,reporter,dept}` | 🔍 |
-| 5 | Credit Risk Team | `ts-credit-team@` | tbd | `ac-ts-creditrisk-{reporter,developer,maintainer}` (owner tier feeds via Trust & Safety drive) | 🔍 |
-| 6 | Trust and Safety | `trustandsafety-dept@` | tbd | `ac-tns-fraud-owner`, `ac-ts-dept`, `ac-ts-creditrisk-owner` (all organizers) | 🔍 |
-| 7 | Design - Department | `design-dept@` | rferrocasagrande (confirm) | `ac-design-dept`(fileOrganizer), `ac-design-owner`(organizer) | 🔍 |
-| 8 | Design - Asset Library | `design-dept@` | same | adds `ac-helcim-team@`(reader, = whole company?) — verify before touching | 🔍 |
-| 9 | Development | `dev-dept@` | jnewfeld/bpopkey (confirm) | `ac-dev-dept`(fileOrganizer), `aobsiye-admin@`(writer) | 🔍 |
-| 10 | Data & Analytics | `data-dept@` | mnar (confirm) | `data-dept@`(fileOrganizer) + 3 direct users | 🔍 nearly flat already |
-| 11 | Marketing - Department | `marketing-dept@` | tbd | `ac-marketing-owner`(fileOrganizer), `ac-marketing-dept`(organizer) | 🔍 |
-| 12 | Operations - Supply Chain | `operations-supchain-team@` | pwoods (confirm) | `ac-operations-dept`(fileOrganizer) | 🔍 |
-| 13 | Operations - Project Team | `operations-project-team@` | ctennant (confirm) | `ac-operations-dept`(fileOrganizer) | 🔍 |
-| 14 | Operations - Office Admin | `operations-admin-team@` | pwoods/schiang (confirm) | `ac-operations-dept`(fileOrganizer) | 🔍 |
-| 15 | Cybersecurity | `cybersecurity_department_mailing_list@` | cfinnson (confirm) | already group-based + 3 direct users | 🔍 nearly flat |
-| 16 | Infrastructure | `infrastructureteam@` | tbd | `ac-security-dept`, `ac-it-dept` (both fileOrganizer) — cross-team, review | 🔍 |
-| 17 | Corporate IT | `it-dept@` | tbd | `it-dept@`(fileOrganizer) + `ac-it-support-reporter@`(organizer, suspicious) | 🔍 |
-| 18 | Finance | `finance-dept@` | tbd | 15 direct users, no group | 🧹 |
-| 19 | Legal | `legalteam@` | tbd | 6 direct users, no group | 🧹 |
-| 20 | People and Culture | `people.n.culture-dept@` | tbd | 5 direct users, no group | 🧹 |
-| 21 | Partnerships | `partnersteam@` | tbd | 11 direct users, no group | 🧹 |
-| 22 | Machine Learning | `mlteam@` | tbd | 11 direct users, no group | 🧹 |
-| 23 | DevOps | `devops@` | tbd | 6 direct users, no group | 🧹 |
-| 24 | QA | part of `dev-dept@`? confirm | tbd | 3 direct users, no group | 🧹 |
-| 25 | Compliance | `complianceteam@` | tbd | 12 direct users, no group | 🧹 |
-| 26 | Information Security | `cybersecurity_department_mailing_list@`? confirm vs Compliance | tbd | `it-dept@`(writer, suspicious) + 11 direct | 🧹 |
-| 27 | Training | training/onboarding owner? | tbd | 2 direct users | 🧹 |
-| 28 | MX Leads | `mx-dept@`? or leads list | tbd | 2 direct users | 🧹 |
-| 29 | Growth / Content / Brand Work | confirm owners | tbd | scattered users; `Content` has `ac-marketing-dept@`(organizer) | 🧹 |
+| 2 | Sales | ITSP-119 | `mx-sales-team@` | pmclellan (confirm) | `ac-mx-sales-{reporter,developer,maintainer}`, `ac-mx-owner` (organizer) | 🔍 |
+| 3 | MX - Support | ITSP-120 | `mx-support-team@` | askosareva (confirm) | `mx-dept@`(fileOrganizer), `finance-dept@`(fileOrganizer) — odd, review | 🔍 |
+| 4 | Product | ITSP-121 | `productteam@` (exclude `productbot`) | tbd (confirm with leads) | `ac-product-{owner,maintainer,developer,reporter,dept}` | 🔍 |
+| 5 | Credit Risk Team | ITSP-122 | `ts-credit-team@` | tbd | `ac-ts-creditrisk-{reporter,developer,maintainer}` (owner tier feeds via Trust & Safety drive) | 🔍 |
+| 6 | Trust and Safety | ITSP-122 | `trustandsafety-dept@` | tbd | `ac-tns-fraud-owner`, `ac-ts-dept`, `ac-ts-creditrisk-owner` (all organizers) | 🔍 |
+| 7 | Design - Department | ITSP-123 | `design-dept@` | rferrocasagrande (confirm) | `ac-design-dept`(fileOrganizer), `ac-design-owner`(organizer) | 🔍 |
+| 8 | Design - Asset Library | ITSP-123 | `design-dept@` | same | adds `ac-helcim-team@`(reader, = whole company?) — verify before touching | 🔍 |
+| 9 | Development | ITSP-124 | `dev-dept@` | jnewfeld/bpopkey (confirm) | `ac-dev-dept`(fileOrganizer), `aobsiye-admin@`(writer) | 🔍 |
+| 10 | Data & Analytics | ITSP-125 | `data-dept@` | mnar (confirm) | `data-dept@`(fileOrganizer) + 3 direct users | 🔍 nearly flat already |
+| 11 | Marketing - Department | ITSP-126 | `marketing-dept@` | tbd | `ac-marketing-owner`(fileOrganizer), `ac-marketing-dept`(organizer) | 🔍 |
+| 12 | Operations - Supply Chain | ITSP-127 | `operations-supchain-team@` | pwoods (confirm) | `ac-operations-dept`(fileOrganizer) | 🔍 |
+| 13 | Operations - Project Team | ITSP-127 | `operations-project-team@` | ctennant (confirm) | `ac-operations-dept`(fileOrganizer) | 🔍 |
+| 14 | Operations - Office Admin | ITSP-127 | `operations-admin-team@` | pwoods/schiang (confirm) | `ac-operations-dept`(fileOrganizer) | 🔍 |
+| 15 | Cybersecurity | ITSP-128 | `cybersecurity_department_mailing_list@` | cfinnson (confirm) | already group-based + 3 direct users | 🔍 nearly flat |
+| 16 | Infrastructure | ITSP-129 | `infrastructureteam@` | tbd | `ac-security-dept`, `ac-it-dept` (both fileOrganizer) — cross-team, review | 🔍 |
+| 17 | Corporate IT | ITSP-129 | `it-dept@` | tbd | `it-dept@`(fileOrganizer) + `ac-it-support-reporter@`(organizer, suspicious) | 🔍 |
+| 18 | Finance | ITSP-130 | `finance-dept@` | tbd | 15 direct users, no group | 🧹 |
+| 19 | Legal | ITSP-131 | `legalteam@` | tbd | 6 direct users, no group | 🧹 |
+| 20 | People and Culture | ITSP-132 | `people.n.culture-dept@` | tbd | 5 direct users, no group | 🧹 |
+| 21 | Partnerships | ITSP-133 | `partnersteam@` | tbd | 11 direct users, no group | 🧹 |
+| 22 | Machine Learning | ITSP-133 | `mlteam@` | tbd | 11 direct users, no group | 🧹 |
+| 23 | DevOps | ITSP-133 | `devops@` | tbd | 6 direct users, no group | 🧹 |
+| 24 | QA | ITSP-133 | part of `dev-dept@`? confirm | tbd | 3 direct users, no group | 🧹 |
+| 25 | Compliance | ITSP-133 | `complianceteam@` | tbd | 12 direct users, no group | 🧹 |
+| 26 | Information Security | ITSP-128 | `cybersecurity_department_mailing_list@`? confirm vs Compliance | tbd | `it-dept@`(writer, suspicious) + 11 direct | 🧹 |
+| 27 | Training | ITSP-133 | training/onboarding owner? | tbd | 2 direct users | 🧹 |
+| 28 | MX Leads | ITSP-133 | `mx-dept@`? or leads list | tbd | 2 direct users | 🧹 |
+| 29 | Growth / Content / Brand Work | ITSP-126 | confirm owners | tbd | scattered users; `Content` has `ac-marketing-dept@`(organizer) | 🧹 |
 
 ## Explicitly out of scope for now
 PCI evidence drives, Board/Legal-sensitive (Helcim Board Data, Series C Diligence), external-share drives (External User Drive, Helcim <> Neubreed, Switch & Google Team), call-recording archives, backups (Asana/Slite/Q10/G-Suite/Quickbooks), test drives (Cordell's test, Test RClone, Test Shared Drive), one-merchant drives.
