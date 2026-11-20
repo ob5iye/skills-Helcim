@@ -177,3 +177,21 @@ Note: `gam resources all ...` is NOT valid — pass the comma-separated resource
 Granted 2026-11-06: **csanderson@helcim.com = editor ("Make changes to events") on all 15 resource calendars** (request: be able to shuffle rooms for interviews/onboardings). How she uses it: add the room calendars via Calendar → Other calendars → Browse resources; with editor rights she can open any booked room event, remove/swap the room, or create bookings directly on a room calendar.
 
 **Cutting an account off Chat (verified 2026-11-06)** Chat service status is Admin-console only (Apps → Google Workspace → Google Chat → Service status), settable per OU — GAM cannot toggle it. Pattern used for `design@helcim.com`: created OU `/Helcim Service Accounts/Chat Disabled` ("Chat Disabled" = service accounts with Chat turned off; do NOT move humans there), moved the account with `gam create org` + `gam update user <user> ou ...`, then set Google Chat Service status = OFF for that OU in the console. Effect: account can't sign in to Chat, disappears from the Chat picker, and new messages to it are refused; existing DM history stays visible to the other party. The parent OU `/Helcim Service Accounts` has 46 accounts incl. functional shared inboxes (help@, success@, finance@) — do NOT turn Chat off OU-wide without confirming nobody signs into those mailboxes directly.
+
+## Shared Drive folder "not updating for the team, only for the uploader" (diagnosed 2026-11-20)
+
+Report (Darcy Hume): "Trust and Safety > Chargebacks > To Enter" not updating for the team, only for Mariana. Recurring complaint.
+
+Verified healthy server-side — diagnosis was client-side (Drive for desktop cache/streaming or stale view), NOT permissions:
+
+- Drive: `Trust and Safety` = `0AAKnzeXubdMjUk9PVA`; `Chargebacks` = `11R98Hvt-HTeg5kOtB_IJNMXdwqgBNv0J`; `TO ENTER` = `1I946RpCj0SFk2foUzUnQm2zR2Miodxmx` (note name is ALL CAPS — grep `Enter` alone won't match). Only ONE "TO ENTER" exists in the drive; Mariana has no duplicate in My Drive.
+- Folder ACLs: inheritance ON, no limited-access flag (`inheritedpermissionsdisabled` not set); all drives members incl. `ac-ts-dept@` (→ ac-ts-fraud/creditrisk → reporter groups) have Content manager. Direct extra grants on the folder: dhume (fileOrganizer), pmashhadi (writer via parent), aobsiye (writer).
+- Mariana Rosa = `mrosa@helcim.com`, member via ac-ts-fraud-reporter. Her latest uploads (2026-11-17, naming pattern `<caseId>0100 ... .pdf`) land in the shared drive correctly。
+- Proof-of-health test: list direct children of the folder as a manager AND as a group-only member and diff IDs:
+  ```bash
+  gam user mjunioread@helcim.com print filelist select <folderId> depth 0 fields id,name,modifiedtime > mgr.csv
+  gam user rfournier@helcim.com print filelist select <folderId> depth 0 fields id,name,modifiedtime > member.csv
+  ```
+  Both returned the same 46 items → no hidden items, no per-user ACL divergence.
+
+Action for end users when this recurs: confirm on drive.google.com web first (server truth). If web shows the new files, the problem is that user's Google Drive for desktop — check its sync status, quit/restart, or sign out/in. If web also misses files, then re-check folder ACLs for a newly flipped limited-access flag.
