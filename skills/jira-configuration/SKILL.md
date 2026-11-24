@@ -487,9 +487,16 @@ Goal: HiBob-driven onboarding/offboarding tickets stop landing in the ITS servic
 
 **Tomorrow / pending:** rebuild offboarding automation to ITOB (screenshot old mapping FIRST, trigger likely Employee terminated; Issue type Employee offboarding) → deactivate old → first live ticket verification (lands on ITOB board, assigned to Abdi, fields filled; nothing new in ITS queue). Default assignee: Space settings → Details → Default assignee = Space lead (instructed, unconfirmed). Cleanup after cutover: bulk-move open ITS onboarding/offboarding tickets into ITOB (open ones seen: ITS-912 Delamont Pending, ITS-904 Hale Pending, ITS-906 Currie Pending start 2026-12-07, ITS-901 Stewart, ITS-899 Bogale…), hide Employee onboarding/offboarding request types from ITS portal so HR can't file into old queue, delete test tickets ITOB-1 + ITOB-2 (Done/Backlog), HiBob-created ITS tickets carry label `No-SLA`.
 
+### 2026-11-24 — ITOB offboarding side: findings + End Date added
+- Old HiBob offboarding automation ("Helcim Offboarding (IT)" → ITS) is **task-list triggered** ("Based on task list", NOT an event — onboarding was "Employee created" event-based). Abdi's HiBob account can't view task lists ("You don't have permission to view task lists") → **offboarding rebuild is BLOCKED on a HiBob super admin (People team) granting task-list access or co-building.**
+- Old offboarding mapping (6 rows, type Field): Preferred Name(First,Last)→Summary; Preferred Name→Preferred Name; Department→HiBob Department; Job title→Job Title; Manager's email→Manager's Email; **Termination date→End Date (customfield_11926)**. No Start/Due date, no laptop, no phone on offboarding.
+- Added **End Date** to `ITOB: Kanban Default Issue Screen` (was missing — would've silently broken row 6). Write-verified via editJiraIssue on ITOB-2.
+- Old automation's Issue type label shows stale "Helcim Offboarding" in HiBob UI = cached name for the same global type 10384 "Employee offboarding". Not a problem.
+- New onboarding automation note: user started a draft offboarding automation with Event "Employee created" by mistake — task-list trigger is the correct one; do NOT activate any event-based offboarding automation.
+
 ## Open items
 
-- [ ] **ITOB cutover finish (2026-11-24):** offboarding automation rebuild to ITOB + deactivate old; confirm old onboarding automation deactivated; verify first live HiBob ticket in ITOB; default assignee = Space lead (unconfirmed); cleanup open ITS onboarding/offboarding tickets → ITOB; hide the two request types from ITS portal; delete ITOB-1/ITOB-2. (Full detail in change history 2026-11-23.)
+- [ ] **ITOB cutover finish:** offboarding automation rebuild to ITOB (**blocked: HiBob task-list permission from People team admin**; trigger = Based on task list, same task list as old, 6-row mapping incl. Termination date→End Date) + deactivate old; confirm old onboarding automation deactivated; verify first live HiBob ticket in ITOB; default assignee = Space lead (unconfirmed); cleanup open ITS onboarding/offboarding tickets → ITOB; hide the two request types from ITS portal; delete ITOB-1/ITOB-2. (Full detail in 2026-11-23/24 entries.)
 
 
 - [ ] **URGENT — Slite-migration token is live**: rotate/revoke at id.atlassian.com → Security → API tokens, then delete `/Users/aobsiye/Documents/Devin/slite-confluence-migration/.env` (confirmed working 2026-10-20 despite earlier "dead" note — see change history).
