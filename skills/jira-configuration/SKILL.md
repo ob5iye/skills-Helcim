@@ -106,6 +106,19 @@ Company-managed **software** space, key `FIN`. Boards: Reporting (scrum), Collec
 - Reporting board columns (2026-09-20): `TO DO | IN PROGRESS | IN REVIEW | PENDING | DONE`. DONE maps Done/Declined/Cancelled/Resolved/Not Applicable. Pending: no resolution, no Min/Max.
 - Editor note: drafts clear by closing the editor without publishing (no explicit Discard in new editor UI; ⋯ menu only has rename/restore). Long-lived "Contains draft" flags had leftover edits (Re-opened/Re-closed transitions) from another admin — cleared by closing, not published by us.
 
+### PEOPLE — People Culture Private (id 11582)
+Company-managed software space, key `PEOPLE`. Deliberately **private** HR space (recruitment, leaves, life events).
+
+- Issue types: Task (10011), Sub-task (10012), **Life Events (11169)**, **Recruitment Request (11136)**.
+- **Form 642** (Recruitment Request intake): creates issue type Recruitment Request; submissions auto-labeled `form`, `form-642`. Builder `/jira/software/c/projects/PEOPLE/form/642/builder`. Submissions land on assignee Caileigh Sanderson.
+- **Permission scheme (pasted from UI 2026-11-24) — group-gated, NOT any-logged-in-user:**
+  - **Create Issues** (this is what gates form 642 — form is on default "Limited" access): Groups `People & Culture` + `helcim-ticket-approver`, Space Role Member.
+  - **Browse Projects**: Groups `People & Culture`, `org-admins`, `helcim-manager-approver`, `helcim-director-approver`, `Helcim Executives`, Space Role Member. ⚠️ Managers get Browse via `helcim-manager-approver` but **cannot submit form 642 unless also in `helcim-ticket-approver`** (Create ≠ Browse).
+  - Singles: Miranda Russell (Assignable User, Edit Issues), Caileigh Sanderson (Assign Issues).
+- People team: Cheryl Hooper (runs the space, bulk of internal items), Caileigh Sanderson (recruitment triage), Miranda Russell.
+- Proven form-642 submitters as of 2026-11 (17 hiring managers): mgonzaga, pmclellan, askosareva, jnewfeld, gramanan, crawlek, mnar, sgale, mthompson, kweaver, rparakkat, jhale, jtaylor, mmorais, pwoods, rferrocasagrande, selliott, abudvytis.
+- **Jira access groups here are native Atlassian groups** — `helcim-ticket-approver` does not exist in Google Workspace (GAM verified 2026-11-24). Membership is managed in Atlassian admin (admin hub → Directory → Groups) and NOT enumerable via MCP.
+
 ### FINP — Finance Private
 Company-managed **software** space, key `FINP` (sensitive HR/payroll tickets). Boards: **Payroll** (Kanban), Private Reporting.
 
@@ -149,6 +162,13 @@ Built via guided UI session (Abdi executing, Devin verifying by MCP). Final stat
 - Credentials learning: the classic API token in skills-Helcim `.env` (`ATLASSIAN_API_TOKEN`, aobsiye identity) authenticates but has near-zero rights: 0 projects visible, ADMINISTER_PROJECTS/ADMINISTER all false. Use it only for anonymous-ish reads; do admin work in UI with Abdi's account or stand up a service account.
 
 ## Change history
+
+### 2026-11-24 — PEOPLE form 642 access: newly promoted managers locked out (bcarron, dhines)
+Question raised directly to Devin (no ticket): why can't bcarron@helcim.com (Brandon Carron `712020:eb302a06-65a7-4668-85ae-bb91bb0f74d7`) and dhines@helcim.com (Dakota Hines `712020:5f01055f-44ca-40b8-a923-1f4a76efa5d4`) open PEOPLE recruitment form 642. Both are active Jira users (Dakota reported FIN-6770 via form 711, Brandon reported ITS-845) with zero PEOPLE footprint. Diagnosis:
+- Jira native forms have 3 access levels (Forms → form → Access icon): **Limited** (default, requires Create Issues permission in the space), **Open** (any licensed user on site), **Public**. Ref: support.atlassian.com/jira-software-cloud/docs/share-your-form/.
+- PEOPLE's scheme grants Create Issues only to `People & Culture`, `helcim-ticket-approver`, Member role (see PEOPLE section). Brandon/Dakota were promoted to manager; promotion alone adds nothing — the other 17 submitting managers carry the `helcim-ticket-approver` grant.
+- Fix options given: (1) add both to **helcim-ticket-approver** in Atlassian admin (matches existing pattern; grants Create without Browse, keeps the private space private), or (2) flip form 642 Access → **Open** (wide intake like FIN's reimbursement forms). Pending decision; change itself is UI-only.
+- Bonus evidence trick for "who can use a form": JQL `project = X AND labels = form-<ID>`, distinct reporters = proven submitters.
 
 ### 2026-11-01 — COMP Data Deletion Form (form 919) missing pretext (ITS-865)
 Request via JSM portal (ITS-865, reporter Reggie Lavender-Mead, Compliance, approver Stephanie Davis, category "Product improvement"): restore the intro/guidance text that vanished from the COMP "Data Deletion Form" (form 919, builder `/jira/software/c/projects/COMP/form/919/builder`), structured like LEGAL form 952's header. Facts established while working it:
