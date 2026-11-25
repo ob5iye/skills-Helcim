@@ -120,3 +120,16 @@
 
 - A dedicated **Hardening / security baseline** epic (CIS/PCI configuration profiles, FileVault/BitLocker, disk encryption escrow). Currently referenced inside Epics 4–5 but could be its own epic.
 - Okta → HubSpot / other-app SSO + SCIM provisioning (was the broader stretch goal beyond device zero-touch).
+
+---
+
+## Change log
+
+### 2026-11-25 — JetBrains Toolbox moved from classic policy to App Installers (Java4Shell response, CVE-2026-114938)
+
+- **Trigger:** JetBrains "Java4Shell" advisory (Marcos flagged in Slack). Patch needs Toolbox **3.9.2+**; IDEs update via Toolbox.
+- **Found:** Toolbox was only ever deployed as classic policy **"Install JetBrains Toolbox"** (category *Non Jamf Apps*, Ongoing, trigger Enrollment Complete, scope All computers) pushing a stale 2.x pkg — fleet had 2.6.2, never updated. Not in the App Installers catalog (30 deployments, Toolbox absent).
+- **Action:** Created **App Installers deployment for JetBrains Toolbox** — update method **Automatic**, initial distribution **Install automatically**, target **All Mac Devices**, category **Development**. Old classic policy **disabled**.
+- **Lesson:** any app deployed via classic "install pkg" policy is frozen in time — prefer App Installers (Automatic) for anything security-relevant. Spotify (Manual) and Slack (Disabled) are the current non-automatic outliers in the catalog.
+- **Not covered by Jamf:** Toolbox-installed IDEs live per-user in `~/Applications` (Toolbox auto-updates them); **project JDKs** (Gradle/Maven daemons) are never covered — devs must update Temurin/Corretto themselves (workaround flag `-XX:-UseBASE64Intrinsics`).
+- **Risk note:** Java4Shell only affects x86-64 CPUs with AVX-512 VBMI — Apple Silicon Macs unaffected; real exposure lives on Intel/Windows (Intune) side.
