@@ -203,3 +203,16 @@ Verified healthy server-side — diagnosis was client-side (Drive for desktop ca
 Action for end users when this recurs: confirm on drive.google.com web first (server truth). If web shows the new files, the problem is that user's Google Drive for desktop — check its sync status, quit/restart, or sign out/in. If web also misses files, then re-check folder ACLs for a newly flipped limited-access flag.
 
 **Recurred + resolved 2026-11-25 (mrosa uploads invisible to the team again):** menu-bar app showed "Up to date / Synced" while her uploads weren't visible to T&S. **Fix that worked this time: sign OUT of Drive for desktop on her Mac, then sign back in** — forces a cache + membership re-enumeration. Pending uploads resumed and the team could see the files. Try this before ACL forensics; the 11-20 server-side verification above still holds. Note the desktop app talks to the macOS File Provider: if Finder's "Google Drive" location or `~/Library/CloudStorage/GoogleDrive-*` is missing entirely, the FP domain isn't mounted — sign out/in re-registers it (`fileproviderctl dump` shows whether a Google Drive domain exists under `com.google.drivefs.fpext`). After re-login the folder uploads flushed and landed correctly in TO ENTER (verified same-day in folder listing; folder unmodified ACL-wise). Follow-up confusion to expect: the uploader "can't find the folder in Finder" — the re-login resets their Finder view and shared drives are NOT under "My Drive": Finder path is **Google Drive → Shared drives → Trust and Safety → Chargebacks → TO ENTER**; quickest re-entry is the Drive status window's **"Open Drive folder"** button, then drag the folder into Finder sidebar Favorites. If the Google Drive location is absent from the sidebar, enable Finder → Settings → Sidebar → Cloud Storage.
+
+## Gmail delegation for holiday/absence cover (set 2026-11-26)
+
+`knako@helcim.com` (Kris Nako) → delegate `bcarron@helcim.com` (Brandon Carron, his manager) so Brandon can read/reply from Kris's inbox while Kris is on holiday. Done admin-side via GAM, no verification email needed:
+
+```bash
+gam user <mailbox@helcim.com> delegate to <delegate@helcim.com>
+gam user <mailbox@helcim.com> print delegates   # verify — expect delegationStatus: accepted
+```
+
+Remove when back: `gam user <mailbox@helcim.com> delete delegate <delegate@helcim.com>`.
+
+Alternatives not used here: admin Gmail routing rule ("Also deliver to" in Apps → Google Workspace → Gmail → Routing) copies every message into the manager's own inbox; user-level Gmail forwarding requires a verification code sent to the destination. Delegation is cleanest for absence cover — mail flow is unchanged and the delegate opens the mailbox from their own account avatar menu.
