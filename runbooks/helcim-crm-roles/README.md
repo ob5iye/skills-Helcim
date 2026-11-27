@@ -162,3 +162,19 @@ Ordered test plan (least privilege): enable group 18 first → test → crm.busi
 → 22 → 6 → 23, then subtract to find minimum set. TEST DEACTIVATE ONLY ON A
 SANDBOX/TEST MERCHANT — it's destructive. Auditing today's role changes needs
 View Change Event Logs (behind the 22 gate) or DB access.
+
+### Cybersecurity CRM panel — hi-res update (2026-11-27, gold-checkbox UI)
+
+- CRM: Access ✓ (top level ON — but subsection gates like 26.access can still be 0)
+- CRM-Business: View ✓; Modify ✗; View Dashboard as Super ✗; Reopen Closed
+  Business ✗; Commerce Account ✗
+- CRM-Addresses: View ✓ only
+- CRM-Merchant Account: View ✓, Modify ✓; Duplicate ✗
+
+Read-outs: (1) crm.merchantAccount rule-out CONFIRMED in UI (Cyber has Modify,
+Exec works with it off/lower). (2) crm.business.modify=0 verified in UI — group 2
+stays a live candidate. (3) DISCREPANCY: DB read had business.super=1 but
+"View Dashboard as Super" is unchecked — re-pull that key, or the super flag maps
+to a different label. (4) CRM-Business offers "Reopen Closed Business" but NO
+close/lock checkbox — further proof lockout lives in section 18/merchantDashboard,
+not CRM.
