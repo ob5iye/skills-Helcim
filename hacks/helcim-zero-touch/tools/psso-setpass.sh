@@ -54,6 +54,7 @@ if ! token=$(security find-generic-password -s "$KEYCHAIN_SERVICE" -w 2>/dev/nul
   command -v op >/dev/null 2>&1 && token=$(op read "$OP_TOKEN_REF" 2>/dev/null)
 fi
 token="${token#Authorization: SSWS }"   # tolerate a stored full header
+token="${token#Authorization: }"        # ... or a bare Authorization: prefix
 if [[ -z "${token:-}" ]]; then
   echo "No token — run once: $0 --set-token  (or store the raw token in 1Password at $OP_TOKEN_REF)"; exit 1
 fi
