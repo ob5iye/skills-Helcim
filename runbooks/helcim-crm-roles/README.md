@@ -126,3 +126,39 @@ Executive role, not Cybersecurity, in these captures.
   Force Logs, View Password Reset Attempt Logs), Growth → Banned IP full,
   Partners → Partner User Disable, Defender → Access. Currently ALL of these sit
   with Executive or are ungranted to Cybersecurity.
+
+## Internal permission model (section IDs, from access analysis 2026-11-27 — partially unverified)
+
+Sections are gated: if `section.access = 0`, sub-permissions under it are inert
+(hypothesis — confirm by having a Cyber user open a CRM ticket, since
+`tickets.view: 1` sits under `26.access: 0`).
+
+Known ID → UI-panel mapping:
+- Sect 1  = Helcim Commerce (customers.transactions etc.)
+- Sect 6  = Risk/Defender (defenderMerchantAccount, riskIncident, event, boardingEvent)
+- Sect 18 = parent of CRM + merchant-dashboard perms (merchantAccount, employee,
+            crm.business, merchantDashboard.merchantAccount)
+- Sect 22 = Users/staff admin (~HSSO panel: merchant.users, staff.*, logs.*)
+- Sect 23 = bare gate, no sub-perms (unidentified panel — cheap to test)
+- Sect 26 = CRM-Tickets; Sect 45 = Dashboard
+
+Access-gate anomalies on Cybersecurity (grants that may be dead):
+`1.customers.modify/delete` under `1.access: 0`; `26.tickets.view` under
+access 0; `22.merchant.users.view` under `22.access: 0`; `45.dashboard.view`
+under `45.access: 0`. CAUTION: flipping a gate activates ALL sub-grants under
+it — before enabling `1.access` re-check `customers.delete` (role was edited
+2026-11-27, screenshots may be stale).
+
+Executive gap map for account lockout (Exec=1, Cyber=0):
+18.merchantAccount.deactivate + .modify; merchantDashboard.merchantAccount.
+deactivate + .modify; 18.employee.deactivate + .modify; 18.crm.business.modify;
+22.access + 22.merchant.users.modify (+ optional logs.access/bruteForce/
+passwordReset); 6.access + 6.defenderMerchantAccount.view/modify +
+6.riskIncident.view/modify/create + 6.event.* + 6.boardingEvent.modify; 23.access.
+Ruled out: crm.merchantAccount.haltProcessing, crm.person.* (Exec works with
+them at 0), crm.business.super (Cyber HAS it, Exec doesn't — possible dead flag).
+
+Ordered test plan (least privilege): enable group 18 first → test → crm.business
+→ 22 → 6 → 23, then subtract to find minimum set. TEST DEACTIVATE ONLY ON A
+SANDBOX/TEST MERCHANT — it's destructive. Auditing today's role changes needs
+View Change Event Logs (behind the 22 gate) or DB access.
