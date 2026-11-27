@@ -21,6 +21,7 @@
 
 set -uo pipefail
 KEYCHAIN_SERVICE="okta-psso-onboarding"
+OP_TOKEN_REF="${OP_TOKEN_REF:-op://Employee/okta-psso-token/credential}"
 ORG="https://helcim.okta.com"
 
 jget() { grep -o "\"$2\":\"[^\"]*\"" <<< "$1" | head -1 | cut -d'"' -f4 || true; }
@@ -50,7 +51,11 @@ user="${1:-}"
 [[ -z "$user" ]] && { echo "usage: $0 <login@helcim.com> [password] | --set-token"; exit 1; }
 
 if ! token=$(security find-generic-password -s "$KEYCHAIN_SERVICE" -w 2>/dev/null); then
-  echo "No token in Keychain — run once: $0 --set-token"; exit 1
+  command -v op >/dev/null 2>&1 && token=$(op read "$OP_TOKEN_REF" 2>/dev/null)
+fi
+token="${token#Authorization: SSWS }"   # tolerate a stored full header
+if [[ -z "${token:-}" ]]; then
+  echo "No token — run once: $0 --set-token  (or store the raw token in 1Password at $OP_TOKEN_REF)"; exit 1
 fi
 
 pass="${2:-}"

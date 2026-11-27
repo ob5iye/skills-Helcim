@@ -2,14 +2,18 @@
 
 ## `psso-setpass.sh` — THE onboarding password tool (bash)
 
-Sets an Okta user's PSSO handover password with must-change OFF, then **proves it with a live authn** (clears the PASSWORD_EXPIRED trap if found). SSWS token lives in macOS Keychain (`okta-psso-onboarding`) via `--set-token`. Token auto-revokes after 30 days idle — recreate in console, re-run `--set-token`.
+Sets an Okta user's PSSO handover password with must-change OFF, then **proves it with a live authn** (clears the PASSWORD_EXPIRED trap if found). Token auto-revokes after 30 days idle — recreate in console, then update wherever it lives.
 
-**1Password-assisted onboarding one-liner (2026-11-27):** the 1Password item `op://Employee/Okta-Zero-touch` holds the per-user `username` + `password` fields (edited per onboarding); the token is NOT stored in 1Password:
+**Token resolution order (2026-11-27):** macOS Keychain (`okta-psso-onboarding`, via `--set-token`) → **1Password `op://Employee/okta-psso-token/credential`** (fallback; override the ref with `OP_TOKEN_REF=...`). A stored header prefix `Authorization: SSWS ` is stripped automatically, but store the **raw token** anyway. With the token in 1Password, the script works on ANY laptop — only requirement is the 1Password CLI signed in, no per-machine `--set-token`.
+
+**Onboarding one-liner (2026-11-27):** 1Password item `op://Employee/Okta-Zero-touch` holds the per-user `username` + `password` fields (edited per onboarding, pulled straight into the call):
 ```bash
 psso-setpass.sh "$(op read 'op://Employee/Okta-Zero-touch/username')" \
                 "$(op read 'op://Employee/Okta-Zero-touch/password')"
 ```
-⚠️ Replaces the old Notes "Zero touch - secret reference" snippet, which had two fatal bugs: no line-continuation backslashes (zsh splits the curl → `command not found: -H`) and a 1Password credential field storing `Authorization: SSWS <token>` while the snippet also prepended `SSWS ` (double prefix → E0000011 even with a live token). If the token is ever stored in 1Password, the field must contain the **raw token only**.
+Success = `OK: password set ... verified by live authn`.
+
+⚠️ Retired: the old Notes "Zero touch - secret reference" snippet — two fatal bugs (no line-continuation backslashes → zsh `command not found: -H`; plus the double `SSWS` prefix). Do not resurrect it.
 
 ## Swift utilities
 
