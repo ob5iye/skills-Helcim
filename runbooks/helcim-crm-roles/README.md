@@ -116,3 +116,13 @@ Near-superuser with safety rails.
 
 Notable: security-ops powers (HSSO staff admin, Banned IP, Webhook) sit with the
 Executive role, not Cybersecurity, in these captures.
+
+## Requests / gaps
+
+- **2026-11-27 — Cybersecurity needs account-lockout ability.** No literal "lock"
+  exists; it maps to Deactivate/Disable actions. Minimum viable grant:
+  Helcim Account → Merchant Account → Deactivate, Employee → Deactivate.
+  Extended incident-response set: HSSO → Staff-Users Modify (+ logs: View Brute
+  Force Logs, View Password Reset Attempt Logs), Growth → Banned IP full,
+  Partners → Partner User Disable, Defender → Access. Currently ALL of these sit
+  with Executive or are ungranted to Cybersecurity.
