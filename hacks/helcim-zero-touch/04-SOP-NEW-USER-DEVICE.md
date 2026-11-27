@@ -45,6 +45,14 @@
 4. Registration completes → **FastPass auto-enrolled, bound to Touch ID** (a brief "continue in browser" handoff may appear — allow opening Okta Verify, tap fingerprint)
 5. Done. From now: Mac unlock = Touch ID; Okta app sign-ons = Touch ID (FastPass)
 
+## C2. Post-2026-11-17 realities (learned on nbogale/JG7KMQ002T)
+
+- **Okta platform-added "Okta End User Settings" policy** (created by `system@okta.com` 2026-11-17, catch-all 2FA ASSURANCE/15-min on `okta_account_settings`) + the Okta Dashboard catch-all → zero-factor new hires hit a **"Set up security methods — Required now"** wall mid-enrollment (catalog #39). **Countermeasures live:** rule `PSSO-Pilot 1FA (zero-touch enrollment exemption)` on both policies → **PSSO-Pilot group add is MANDATORY before enrollment** (was step 3).
+- **If a first attempt partially enrolled then got wiped/re-run:** stale `signed_nonce` FastPass ← dead key → browser/Okta Verify loop (catalog #4 variant). Fix server-side: list factors (`GET /users/{id}/factors`), API-DELETE the stale one — safe mid-flight, "Back to sign in" survives.
+- **On the "Set up security methods" page: ONLY pick Okta Verify → Set up** (Touch ID in OV = signed_nonce FastPass). "Security Key or Biometric" = WebAuthn = YubiKey-AAGUID-constrained = Touch ID passkey FAILS (catalog #40). Google Authenticator = never.
+- **Email factor may get enrolled incidentally** during the settings detour — harmless, leave it.
+- **Recovery state machine if the run went sideways** (catalog #41): Registration 🟢 + "SSO tokens expired" → click Authenticate; a rejected password with ZERO new Okta events = a LOCAL gate, not creds (offline logins prove the local password). Realign via Password → Change… (same value re-encrypts keychain), else Registration → Repair.
+
 ## D. Verification (5 min)
 
 - [ ] **Okta System Log, in order (the proof signature):** `pki.cert.issue` → `device.enrollment.create` + `pki.cert.bind` → `device.platform_sso.keys.register` → `device.password_sync.authentication SUCCESS` → `user.mfa.factor.activate` (Okta Verify) + `device.password_sync.enrollment.create`. Marcelo 2026-10-21: whole chain in 3m35s. Missing `cert.bind`/`keys.register` = no cert at registration (#36/#37); zero events = extension failed locally
